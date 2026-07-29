@@ -37,7 +37,7 @@ export function TransactionErrorCard({
         <div className="space-y-2">
           <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">{title}</h3>
           <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mx-auto">
-            {message || "An unexpected error occurred while processing your request on the Stellar network."}
+            {message || "An unexpected error occurred while processing your request on the Robinhood Chain."}
           </p>
         </div>
 

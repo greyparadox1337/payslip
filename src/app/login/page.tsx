@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { requestAccess } from "@stellar/freighter-api";
+import { connectInjectedWallet } from "@/lib/chain";
 import { Mail, Lock, Eye, EyeOff, Loader2, AlertTriangle, ShieldAlert, Wallet } from "lucide-react";
 import { useToast } from "@/contexts/ToastContext";
 import { Input } from "@/components/ui/input";
@@ -107,7 +107,7 @@ function LoginContent() {
   const handleWalletLogin = async () => {
     setIsSubmitting(true);
     try {
-      const { address } = await requestAccess();
+      const { address } = await connectInjectedWallet();
       if (!address) throw new Error("Wallet not linked.");
       
       const res = await fetch("/api/auth/wallet-login", {
@@ -136,7 +136,7 @@ function LoginContent() {
         addToast("Signed in securely!", "success");
       }
     } catch (_err) {
-      addToast("Freighter not installed or mapping failed", "error");
+      addToast("MetaMask not installed or mapping failed", "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -299,7 +299,7 @@ function LoginContent() {
                 className="w-full flex items-center justify-center gap-2 h-11 border border-cyan-500/30 text-cyan-500 hover:bg-cyan-500/10 font-semibold transition-all shadow-sm bg-transparent"
               >
                 <Wallet className="h-4 w-4" />
-                Sign in with Freighter wallet
+                Sign in with MetaMask wallet
               </Button>
             </div>
           )}

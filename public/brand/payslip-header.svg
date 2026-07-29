@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 500" width="1500" height="500" role="img" aria-label="PaySlip header banner">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0a1f"/>
+      <stop offset="42%" stop-color="#1a1748"/>
+      <stop offset="100%" stop-color="#030712"/>
+    </linearGradient>
+    <linearGradient id="bolt" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="head" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="60%" stop-color="#c7d2fe"/>
+      <stop offset="100%" stop-color="#67e8f9"/>
+    </linearGradient>
+    <linearGradient id="rule" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0"/>
+      <stop offset="35%" stop-color="#a78bfa" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.42"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="halo2" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.26"/>
+      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1500" height="500" fill="url(#bg)"/>
+
+  <!-- grid -->
+  <g opacity="0.12" stroke="#8b5cf6" stroke-width="1">
+    <path d="M0 100H1500M0 200H1500M0 300H1500M0 400H1500"/>
+    <path d="M150 0V500M300 0V500M450 0V500M600 0V500M750 0V500M900 0V500M1050 0V500M1200 0V500M1350 0V500"/>
+  </g>
+
+  <circle cx="700" cy="250" r="440" fill="url(#halo)"/>
+  <circle cx="1300" cy="140" r="330" fill="url(#halo2)"/>
+
+  <!-- oversized bolt watermark, right -->
+  <g opacity="0.16" transform="translate(1148 30) scale(4.4)">
+    <path d="M58 4 L18 56 H44 L38 96 L82 42 H54 Z" fill="url(#bolt)"/>
+  </g>
+
+  <!-- torn-edge motif along the bottom -->
+  <g fill="#6366f1" opacity="0.22">
+    <path d="M0 500 l25 -22 25 22 25 -22 25 22 25 -22 25 22 25 -22 25 22 25 -22 25 22
+             25 -22 25 22 25 -22 25 22 25 -22 25 22 25 -22 25 22 25 -22 25 22
+             25 -22 25 22 25 -22 25 22 25 -22 25 22 25 -22 25 22 25 -22 25 22
+             25 -22 25 22 25 -22 25 22 25 -22 25 22 25 -22 25 22 25 -22 25 22
+             25 -22 25 22 25 -22 25 22 25 -22 25 22 25 -22 25 22 25 -22 25 22
+             25 -22 25 22 25 -22 25 22 25 -22 25 22 V500 z"/>
+  </g>
+
+  <!-- copy shifted right of the profile-picture overlay (approx x 40-372, y 350-500) -->
+  <g font-family="Inter, SF Pro Display, Helvetica Neue, Arial, sans-serif" transform="translate(140 0)">
+    <!-- headline block: kept clear of the bottom-left avatar overlay -->
+    <g transform="translate(300 148)">
+      <rect x="0" y="-27" width="300" height="40" rx="20" fill="#6366f1" fill-opacity="0.16" stroke="#6366f1" stroke-opacity="0.5"/>
+      <text x="24" y="0" font-size="17" font-weight="700" letter-spacing="3.2" fill="#a5b4fc">ON-CHAIN ETH PAYROLL</text>
+    </g>
+
+    <text x="300" y="258" font-size="84" font-weight="800" letter-spacing="-2.6" fill="url(#head)">PaySlip</text>
+    <rect x="302" y="282" width="520" height="3" rx="1.5" fill="url(#rule)"/>
+
+    <text x="300" y="336" font-size="34" font-weight="600" letter-spacing="-0.4" fill="#e2e8f0">Payroll at the speed of a block.</text>
+
+    <text x="300" y="392" font-size="21" font-weight="500" letter-spacing="0.2" fill="#94a3b8">
+      Pay a global team in ETH on Robinhood Chain — seconds, not days.
+    </text>
+
+    <g font-size="17" font-weight="700" letter-spacing="1.6" fill="#64748b">
+      <text x="300" y="444">INSTANT SETTLEMENT</text>
+      <text x="530" y="444" fill="#3f4a63">·</text>
+      <text x="556" y="444">BULK DISBURSE</text>
+      <text x="738" y="444" fill="#3f4a63">·</text>
+      <text x="764" y="444">PROOF ON-CHAIN</text>
+    </g>
+  </g>
+</svg>

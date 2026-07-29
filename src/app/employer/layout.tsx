@@ -8,7 +8,8 @@ import { SessionWatcher } from "@/components/SessionWatcher";
 import { OrgProvider } from "@/lib/context/OrgContext";
 import WalletStatusBar from "@/components/shared/WalletStatusBar";
 import Level1StatusBadge from "@/components/shared/Level1StatusBadge";
-import { Networks } from "@stellar/stellar-sdk";
+import { isOnRobinhoodChain } from "@/lib/chain";
+import { ACTIVE_CHAIN } from "@/lib/chains";
 
 export default function EmployerLayout({
   children,
@@ -22,15 +23,9 @@ export default function EmployerLayout({
     async function checkNetwork() {
       if (typeof window === 'undefined') return
       try {
-        const { getNetworkDetails } = await import('@stellar/freighter-api')
-        const details = await getNetworkDetails()
-        if (details.networkPassphrase !== Networks.TESTNET) {
-          setWrongNetwork(true)
-        } else {
-          setWrongNetwork(false)
-        }
+        setWrongNetwork(!(await isOnRobinhoodChain()))
       } catch {
-        // Freighter not installed, handled by WalletManager
+        // No wallet installed, handled by WalletManager
       }
     }
     checkNetwork()
@@ -76,7 +71,7 @@ export default function EmployerLayout({
           <div className="w-full bg-rose-600 text-white py-2 px-4 flex items-center justify-center gap-2 z-[100] animate-in slide-in-from-top duration-300">
             <AlertTriangle className="h-4 w-4" />
             <span className="text-xs font-bold uppercase tracking-wider">
-              Wrong Network: Switch Freighter to Stellar Testnet to use PaySlip
+              Wrong Network: Switch your wallet to {ACTIVE_CHAIN.name} to use PaySlip
             </span>
           </div>
         )}

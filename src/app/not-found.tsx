@@ -24,7 +24,7 @@ export default function NotFound() {
         </div>
 
         <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 tracking-tight">
-          This page got lost on the Stellar network
+          This page got lost on the Robinhood Chain
         </h2>
         <p className="text-muted-foreground text-lg mb-12 max-w-md mx-auto leading-relaxed">
           The coordinates you followed don't exist in our current ledger. You might have hit a broken link or an invalid address.

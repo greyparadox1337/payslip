@@ -251,7 +251,6 @@ function HowItWorksStep({ step, title, body, icon: Icon, color, tag }: { step: n
   const colorMap: Record<string, string> = {
     violet: "bg-violet-500 border-violet-500/20 text-violet-400 shadow-[0_0_15px_rgba(139,92,246,0.3)]",
     cyan: "bg-cyan-500 border-cyan-500/20 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)]",
-    cyan: "bg-cyan-500 border-cyan-500/20 text-cyan-400 shadow-[0_0_15px_rgba(16,185,129,0.3)]",
   };
 
   return (
@@ -287,7 +286,7 @@ function DashboardMockup() {
         </div>
         <div className="flex-1 max-w-md bg-black/20 rounded-md py-1 px-4 text-[10px] text-textMuted mx-auto border border-white/5 flex items-center gap-2">
           <Globe className="h-3 w-3 opacity-30" />
-          app.payslip.stellar/dashboard
+          app.payslip.xyz/dashboard
         </div>
       </div>
       
@@ -365,7 +364,7 @@ function DashboardMockup() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-[11px] font-bold font-mono">+{row.amt} XLM</p>
+                    <p className="text-[11px] font-bold font-mono">+{row.amt} ETH</p>
                     <p className="text-[8px] text-cyan-500 font-bold uppercase">Success</p>
                   </div>
                 </div>
@@ -398,7 +397,7 @@ function DashboardMockup() {
   );
 }
 
-function StellarFlowDiagram() {
+function ChainFlowDiagram() {
   return (
     <div className="mt-20 py-12 px-6 border border-white/5 rounded-3xl bg-surfaceUp/30 backdrop-blur-xl relative overflow-hidden">
       <div className="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-24 relative z-10">
@@ -417,12 +416,12 @@ function StellarFlowDiagram() {
           <div className="absolute -right-2 -top-1 border-t-4 border-l-4 border-transparent border-l-cyan-500 h-2 w-2" />
         </div>
 
-        {/* Stellar Node */}
+        {/* Robinhood Chain Node */}
         <div className="flex flex-col items-center group">
           <div className="w-20 h-20 rounded-full border-2 border-cyan-500/50 bg-cyan-500/10 flex items-center justify-center shadow-[0_0_30px_rgba(34,211,238,0.2)] animate-pulse group-hover:scale-110 transition-transform duration-300">
             <Zap className="h-9 w-9 text-cyan-400" />
           </div>
-          <p className="mt-4 text-xs font-bold tracking-widest text-cyan-400 uppercase">Stellar Network</p>
+          <p className="mt-4 text-xs font-bold tracking-widest text-cyan-400 uppercase">Robinhood Chain Network</p>
         </div>
 
         {/* Arrow 2 Container */}
@@ -742,7 +741,7 @@ export default function HomePage() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
                   </span>
-                  <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent italic">Stellar Network Native</span>
+                  <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent italic">Robinhood Chain Network Native</span>
                 </div>
               </div>
 
@@ -795,7 +794,7 @@ export default function HomePage() {
                 </div>
                 <div>
                   <h4 className="text-[28px] font-bold text-foreground">
-                    <StatCounter end={2.3} decimalPlaces={1} suffix="M" prefix="XLM " />
+                    <StatCounter end={2.3} decimalPlaces={1} suffix="M" prefix="ETH " />
                   </h4>
                   <p className="text-sm text-muted-foreground mt-1">Disbursed</p>
                 </div>
@@ -853,7 +852,7 @@ export default function HomePage() {
                       </div>
                       <div className="text-right">
                         <p className="text-[14px] font-bold text-foreground font-mono">
-                          +{tx.amount} <span className="text-[10px] text-muted-foreground font-sans">XLM</span>
+                          +{tx.amount} <span className="text-[10px] text-muted-foreground font-sans">ETH</span>
                         </p>
                       </div>
                     </div>
@@ -877,7 +876,7 @@ export default function HomePage() {
           {[...Array(2)].map((_, i) => (
             <React.Fragment key={i}>
               <span className="text-sm font-bold text-slate-500 flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" /> STELLAR NETWORK NATIVE
+                <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" /> ROBINHOOD CHAIN NATIVE
               </span>
               <span className="text-sm font-bold text-slate-500 flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-violet-500" /> INSTANT DISBURSEMENT
@@ -971,8 +970,8 @@ function HowItWorksSection() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {[
-              { step: 1, title: "Connect wallet", desc: "No passwords. Just link Freighter.", icon: Wallet },
-              { step: 2, title: "Add employees", desc: "Input names and XLM salaries.", icon: Users },
+              { step: 1, title: "Connect wallet", desc: "No passwords. Just link MetaMask.", icon: Wallet },
+              { step: 2, title: "Add employees", desc: "Input names and ETH salaries.", icon: Users },
               { step: 3, title: "Disburse instantly", desc: "Click run, and everyone gets paid.", icon: Zap },
             ].map((item, i) => (
               <div key={i} className="relative z-10 flex flex-col items-center text-center">
@@ -1010,7 +1009,7 @@ function StatsSection() {
         <hr className="border-t border-border/20 my-8" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           <StatCard icon={Zap} borderColor="border-indigo-500" gradient="from-indigo-500 to-violet-500" label="Payments processed" target={2400000} suffix="+" />
-          <StatCard icon={Globe} borderColor="border-cyan-500" gradient="from-cyan-500 to-sky-500" label="XLM disbursed" target={18700000} suffix="+" />
+          <StatCard icon={Globe} borderColor="border-cyan-500" gradient="from-cyan-500 to-sky-500" label="ETH disbursed" target={18700000} suffix="+" />
           <StatCard icon={MapPin} borderColor="border-cyan-500" gradient="from-cyan-500 to-indigo-500" label="Countries reached" target={47} />
           <StatCard icon={Building2} borderColor="border-fuchsia-500" gradient="from-fuchsia-500 to-pink-500" label="Companies using PaySlip" target={340} suffix="+" />
         </div>
@@ -1041,10 +1040,10 @@ function FeaturesSection() {
           <div className="h-1 w-[60px] bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          <FeatureCard index={0} icon={Rocket} title="Instant global payroll" body="Send salaries to any wallet address worldwide. Transactions confirm in under 5 seconds on Stellar." iconBg="bg-indigo-500/15" iconColor="text-indigo-400" hoverGlow="indigo-500/40" />
+          <FeatureCard index={0} icon={Rocket} title="Instant global payroll" body="Send salaries to any wallet address worldwide. Transactions confirm in under 5 seconds on Robinhood Chain." iconBg="bg-indigo-500/15" iconColor="text-indigo-400" hoverGlow="indigo-500/40" />
           <FeatureCard index={1} icon={Coins} title="Near-zero fees" body="Pay your entire team for less than $0.01 in network fees. No hidden charges, ever." iconBg="bg-amber-500/15" iconColor="text-amber-400" hoverGlow="amber-500/40" />
           <FeatureCard index={2} icon={ShieldCheck} title="Immutable payslips" body="Every payment creates a permanent blockchain record. No disputes, no questions." iconBg="bg-cyan-500/15" iconColor="text-cyan-400" hoverGlow="cyan-500/40" />
-          <FeatureCard index={3} icon={ArrowRightLeft} title="XLM and USDC" body="Pay in native XLM or USDC stablecoin. Employees choose what they receive." iconBg="bg-cyan-500/15" iconColor="text-cyan-400" hoverGlow="cyan-500/40" />
+          <FeatureCard index={3} icon={ArrowRightLeft} title="ETH and USDC" body="Pay in native ETH or USDC stablecoin. Employees choose what they receive." iconBg="bg-cyan-500/15" iconColor="text-cyan-400" hoverGlow="cyan-500/40" />
           <FeatureCard index={4} icon={Users} title="Unlimited employees" body="Add employees, set salaries, and manage multiple organisations from one dashboard." iconBg="bg-violet-500/15" iconColor="text-violet-400" hoverGlow="violet-500/40" />
           <FeatureCard index={5} icon={FileDown} title="Branded payslips" body="Generate beautiful PDF payslips with your company branding and QR verification." iconBg="bg-fuchsia-500/15" iconColor="text-fuchsia-400" hoverGlow="fuchsia-500/40" />
         </div>
@@ -1074,14 +1073,14 @@ function DetailedHowItWorksSection() {
             </svg>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 sm:gap-12 relative z-10">
-            <HowItWorksStep step={1} title="Connect your wallet" body="Install Freighter and connect your Stellar wallet in one click." icon={Wallet} color="violet" tag="Takes 30 seconds" />
+            <HowItWorksStep step={1} title="Connect your wallet" body="Install MetaMask and connect your EVM wallet in one click." icon={Wallet} color="violet" tag="Takes 30 seconds" />
             <HowItWorksStep step={2} title="Add your team" body="Import employees with their wallet addresses." icon={Users} color="cyan" tag="Import via CSV" />
-            <HowItWorksStep step={3} title="Pay with one click" body="Disburse to your entire team simultaneously." icon={Zap} color="cyan" tag="Under 5 seconds" />
+            <HowItWorksStep step={3} title="Pay with one click" body="Disburse to your entire team in one run." icon={Zap} color="cyan" tag="~100ms blocks" />
           </div>
         </div>
         <div className="space-y-24">
           <DashboardMockup />
-          <StellarFlowDiagram />
+          <ChainFlowDiagram />
         </div>
       </div>
     </section>
@@ -1106,8 +1105,8 @@ function PricingSection({ isAnnual, setIsAnnual }: { isAnnual: boolean, setIsAnn
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch pt-4">
-          <PricingCard name="Free forever" price="$0" sub="/ month" theme="violet" ctaText="Get started free" features={["Up to 5 employees", "XLM payments only", "Basic payslips"]} />
-          <PricingCard name="Pro Plan" price={isAnnual ? "$23" : "$29"} sub={isAnnual ? "/ mo billed annually" : "/ month"} theme="gradient" featured={true} ctaText="Start Pro trial" features={["Unlimited employees", "XLM + USDC payments", "Branded PDF payslips"]} />
+          <PricingCard name="Free forever" price="$0" sub="/ month" theme="violet" ctaText="Get started free" features={["Up to 5 employees", "ETH payments only", "Basic payslips"]} />
+          <PricingCard name="Pro Plan" price={isAnnual ? "$23" : "$29"} sub={isAnnual ? "/ mo billed annually" : "/ month"} theme="gradient" featured={true} ctaText="Start Pro trial" features={["Unlimited employees", "ETH + USDC payments", "Branded PDF payslips"]} />
           <PricingCard name="Enterprise" price="Custom" sub="" theme="amber" ctaText="Contact us" features={["Everything in Pro", "Custom integrations", "Dedicated support"]} />
         </div>
       </div>

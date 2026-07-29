@@ -4,7 +4,6 @@ export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useOrg } from "@/lib/context/OrgContext";
-import Image from "next/image";
 import {
   Users,
   CalendarClock,
@@ -48,16 +47,16 @@ import {
 } from "recharts";
 
 import { useCurrencyStore } from "@/store/currencyStore";
-import { fetchXLMHistory } from "@/lib/price";
-import { bulkDisburse, connectWallet, getWalletBalance } from "@/lib/stellar";
-import { requestAccess } from "@stellar/freighter-api";
+import { fetchETHHistory } from "@/lib/price";
+import { bulkDisburse, connectWallet, getWalletBalance, estimateTransferFee } from "@/lib/chain";
+import { connectInjectedWallet } from "@/lib/chain";
 import { PayrollTracker } from "@/components/PayrollTracker";
 import { OrgSwitcher } from "@/components/OrgSwitcher";
 import { CurrencyToggle } from "@/components/CurrencyToggle";
 import { WalletButton } from "@/components/WalletButton";
 import WalletManager from "@/components/shared/WalletManager";
-import SendXLMPanel from "@/components/shared/SendXLMPanel";
-import { getTransactionHistory, PaymentRecord } from "@/lib/stellar";
+import SendPanel from "@/components/shared/SendPanel";
+import { getTransactionHistory, PaymentRecord } from "@/lib/chain";
 import { useSession } from "next-auth/react";
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -163,7 +162,7 @@ function truncateAddress(addr: string) {
   return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
 }
 
-function formatXLM(amount: number) {
+function formatETH(amount: number) {
   return new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
@@ -236,7 +235,7 @@ function useCountUp(end: number, duration: number = 2000) {
  * ═════════════════════════════════════════════ */
 export default function EmployerDashboard() {
   const { data: session, update } = useSession();
-  const { currency, xlmUsdRate, refreshRate } = useCurrencyStore();
+  const { currency, ethUsdRate, refreshRate } = useCurrencyStore();
   const { activeOrg, orgs, switchOrg, createOrg, loading: orgLoading, transitioning } = useOrg();
   const [employees, setEmployees] = useState<Employee[]>([]);
 
@@ -245,12 +244,18 @@ export default function EmployerDashboard() {
   const [balanceLoading, setBalanceLoading] = useState(false);
   const [showMismatch, setShowMismatch] = useState(false);
   const [linking, setLinking] = useState(false);
+  const [gasPerTransfer, setGasPerTransfer] = useState(0);
+
+  // Gas price is live on an L2, so quote it rather than hardcoding a flat fee
+  useEffect(() => {
+    estimateTransferFee().then(setGasPerTransfer);
+  }, []);
 
   // Mismatch Detection & Balance Reload
   useEffect(() => {
     async function checkWallet() {
       try {
-        const pk = await requestAccess().then(r => r.address);
+        const pk = await connectInjectedWallet().then(r => r.address);
         const userWallet = (session?.user as any)?.linkedWallet;
         const orgWallet = activeOrg?.walletAddress;
 
@@ -274,7 +279,7 @@ export default function EmployerDashboard() {
   const refreshBalance = async () => {
     setBalanceLoading(true);
     try {
-      const pk = await requestAccess().then(r => r.address);
+      const pk = await connectInjectedWallet().then(r => r.address);
       const bal = await getWalletBalance(pk);
       setBalance(bal);
     } catch (err) {}
@@ -336,7 +341,7 @@ export default function EmployerDashboard() {
   const [chartData, setChartData] = useState<{timestamp: number; price: number}[]>([]);
 
   useEffect(() => {
-    fetchXLMHistory().then(setChartData);
+    fetchETHHistory().then(setChartData);
     
     // Refresh the live rate every 30s
     const rateInterval = setInterval(refreshRate, 30000);
@@ -490,7 +495,8 @@ export default function EmployerDashboard() {
 
   /* ── Payroll Flow ── */
   const activeEmps = employees.filter(e => e.status !== "inactive");
-  const estimatedFee = activeEmps.length * 0.00001;
+  // One transaction per employee on the EVM, so gas scales with headcount
+  const estimatedFee = activeEmps.length * gasPerTransfer;
 
   async function payrollExecutor() {
     const entries = activeEmps.map((emp) => ({
@@ -499,11 +505,21 @@ export default function EmployerDashboard() {
       employeeName: emp.name,
     }));
     const results = await bulkDisburse(entries, currency);
-    const successResult = results.find((r) => r.success);
-    if (!successResult) {
-      throw new Error(results[0]?.error || "Transaction failed");
+
+    const succeeded = results.filter((r) => r.success);
+    const failed = results.filter((r) => !r.success);
+
+    // Each payment is its own transaction, so a run can land partially. Never
+    // report success while some employees went unpaid.
+    if (failed.length) {
+      const names = failed.map((r) => r.employeeName).join(", ");
+      throw new Error(
+        `Paid ${succeeded.length}/${results.length}. Failed for ${names}: ${failed[0].error}`
+      );
     }
-    return successResult.txHash || "";
+
+    // Representative hash for the run — the last confirmed payment
+    return succeeded[succeeded.length - 1]?.txHash || "";
   }
 
   function startPayrollTracker() {
@@ -539,7 +555,7 @@ export default function EmployerDashboard() {
         {/* Logo Area */}
         <div className="px-6 py-8 border-b border-white/[0.06]">
           <h1 className="text-2xl font-bold gradient-text tracking-tight">PaySlip</h1>
-          <p className="text-[11px] text-textMuted font-medium uppercase tracking-widest mt-1">Payroll on Stellar</p>
+          <p className="text-[11px] text-textMuted font-medium uppercase tracking-widest mt-1">Payroll on Robinhood Chain</p>
         </div>
         
         {/* Nav */}
@@ -576,13 +592,13 @@ export default function EmployerDashboard() {
           <div className="space-y-1">
             <p className="text-[10px] font-bold text-textHint uppercase tracking-wider">Available Balance</p>
             <p className="text-lg font-bold gradient-text-2 font-mono truncate">
-              {balance ? `${formatXLM(Number(balance))} XLM` : "0.00 XLM"}
+              {balance ? `${formatETH(Number(balance))} ETH` : "0.00 ETH"}
             </p>
           </div>
           
           <div className="flex items-center justify-between">
             <div className="px-2.5 py-1 rounded-full bg-sky/15 border border-sky/20">
-              <span className="text-[9px] font-black text-sky uppercase tracking-tighter">Stellar Testnet</span>
+              <span className="text-[9px] font-black text-sky uppercase tracking-tighter">Robinhood Chain Testnet</span>
             </div>
             <span className="text-[10px] text-textHint font-medium">
               {lastLoginText}
@@ -611,7 +627,7 @@ export default function EmployerDashboard() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
                 </span>
-                <span className="text-[10px] font-black text-white tracking-widest uppercase">Stellar Testnet</span>
+                <span className="text-[10px] font-black text-white tracking-widest uppercase">Robinhood Chain Testnet</span>
               </div>
             </div>
           </div>
@@ -621,7 +637,7 @@ export default function EmployerDashboard() {
             <div className="hidden lg:flex items-center gap-3 px-3 py-1.5 bg-white/[0.03] border border-white/10 rounded-full">
                <Wallet className="h-3.5 w-3.5 text-sky" />
                <span className="text-[13px] font-bold gradient-text-2 font-mono tracking-tight">
-                 {balance === null ? <span title="Install Freighter to configure bounds">—</span> : `${formatXLM(Number(balance))} XLM`}
+                 {balance === null ? <span title="Install MetaMask to configure bounds">—</span> : `${formatETH(Number(balance))} ETH`}
                </span>
                <button onClick={refreshBalance} disabled={balanceLoading}>
                   <RefreshCw className={`h-[12px] w-[12px] text-textMuted transition-transform ${balanceLoading ? "animate-spin text-sky" : "hover:text-foreground"}`} />
@@ -638,13 +654,13 @@ export default function EmployerDashboard() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan"></span>
                 </span>
-                <span className="text-[11px] sm:text-[12px] font-bold text-white font-mono">XLM ${xlmUsdRate.toFixed(4)}</span>
+                <span className="text-[11px] sm:text-[12px] font-bold text-white font-mono">ETH ${ethUsdRate.toFixed(4)}</span>
               </button>
               
               {priceOpen && (
                  <div className="absolute top-12 right-0 w-64 bg-surfaceUp border border-white/10 shadow-2xl rounded-xl p-3 z-50 animate-in fade-in zoom-in-95">
                     <div className="flex items-center justify-between mb-2 pb-2 border-b border-white/10">
-                      <p className="text-[10px] text-textMuted font-bold uppercase tracking-wider">7-Day XLM/USD</p>
+                      <p className="text-[10px] text-textMuted font-bold uppercase tracking-wider">7-Day ETH/USD</p>
                       <Activity className="h-3 w-3 text-cyan" />
                     </div>
                     <div className="h-24 w-full">
@@ -684,7 +700,7 @@ export default function EmployerDashboard() {
           <div className="mx-6 lg:mx-8 mt-6 bg-indigo-500/10 border-l-[3px] border-indigo-500 rounded-r-lg p-3.5 flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-3">
               <Wallet className="h-[18px] w-[18px] text-indigo-400" />
-              <p className="text-[13px] font-medium text-indigo-100/90">Link your Stellar wallet to enable payroll disbursement for <strong className="text-white">{activeOrg?.name}</strong>.</p>
+              <p className="text-[13px] font-medium text-indigo-100/90">Link your EVM wallet to enable payroll disbursement for <strong className="text-white">{activeOrg?.name}</strong>.</p>
             </div>
             <Button onClick={handleLinkWallet} disabled={linking} size="sm" className="bg-indigo-500 hover:bg-indigo-600 text-white h-8 text-[12px]">
               {linking ? <Loader2 className="h-3 w-3 animate-spin" /> : "Link wallet"}
@@ -696,7 +712,7 @@ export default function EmployerDashboard() {
           <div className="mx-6 lg:mx-8 mt-6 bg-yellow-500/10 border-l-[3px] border-yellow-500 rounded-r-lg p-3.5 flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-3">
               <AlertCircle className="h-[18px] w-[18px] text-yellow-500" />
-              <p className="text-[13px] font-medium text-yellow-100/90">Your Freighter wallet changed. Re-link to continue running payroll properly.</p>
+              <p className="text-[13px] font-medium text-yellow-100/90">Your MetaMask wallet changed. Re-link to continue running payroll properly.</p>
             </div>
             <Button onClick={handleLinkWallet} disabled={linking} size="sm" className="bg-yellow-500 hover:bg-yellow-600 text-yellow-950 font-semibold border-none h-8 text-[12px]">
                {linking ? <Loader2 className="h-3 w-3 animate-spin" /> : "Re-link"}
@@ -745,7 +761,7 @@ export default function EmployerDashboard() {
               </CardHeader>
               <CardContent>
                 <p className="text-3xl font-bold font-mono tracking-tighter gradient-text-2">
-                  {formatXLM(animDisbursed)} <span className="text-sm font-sans text-textMuted uppercase">XLM</span>
+                  {formatETH(animDisbursed)} <span className="text-sm font-sans text-textMuted uppercase">ETH</span>
                 </p>
                 <p className="text-[11px] font-medium text-cyan mt-3 flex items-center gap-1">
                   <ArrowUpRight className="h-3 w-3" /> 4.2% vs last month
@@ -769,12 +785,8 @@ export default function EmployerDashboard() {
             {/* System Overview Visual */}
             <Card className="col-span-1 lg:col-span-4 bg-[#0f0f2e] border-white/[0.06] shadow-2xl overflow-hidden group">
               <div className="relative h-48 w-full overflow-hidden">
-                <Image 
-                  src="/payslip_dashboard.png" 
-                  alt="System Overview" 
-                  fill 
-                  className="object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-500 scale-110 group-hover:scale-100"
-                />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(99,102,241,0.35),transparent_60%),radial-gradient(ellipse_at_bottom_left,rgba(34,211,238,0.18),transparent_55%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(148,163,184,0.07)_1px,transparent_1px),linear-gradient(to_bottom,rgba(148,163,184,0.07)_1px,transparent_1px)] bg-[size:32px_32px]" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f2e] via-[#0f0f2e]/20 to-transparent" />
                 <div className="absolute bottom-4 left-6">
                   <h3 className="text-lg font-bold text-white mb-1">Network Command Center</h3>
@@ -784,13 +796,13 @@ export default function EmployerDashboard() {
             </Card>
           </div>
 
-          {/* Stellar Wallet Section */}
+          {/* Robinhood Chain Wallet Section */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-1">
               <WalletManager />
             </div>
             <div className="lg:col-span-1">
-              <SendXLMPanel compact />
+              <SendPanel compact />
             </div>
             <div className="lg:col-span-1">
               <Card className="h-full bg-[#0f0f2e] border-white/[0.06] shadow-2xl">
@@ -802,7 +814,7 @@ export default function EmployerDashboard() {
                 </CardHeader>
                 <CardContent>
                    <div className="space-y-4">
-                      {/* We'll fetch these from Horizon in a real app, 
+                      {/* We'll fetch these from the RPC in a real app, 
                           but for Level 1 we satisfy the UI requirement */}
                       <p className="text-xs text-muted-foreground text-center py-8 italic font-medium">
                         Connect wallet to view ledger history
@@ -818,7 +830,7 @@ export default function EmployerDashboard() {
             <CardHeader className="flex flex-row items-center justify-between border-b border-white/[0.06] pb-4">
               <div>
                 <CardTitle className="text-base font-bold text-white tracking-tight">Disbursement Intelligence</CardTitle>
-                <p className="text-[12px] text-textMuted mt-1">XLM volume sent over recent months compared to prior period.</p>
+                <p className="text-[12px] text-textMuted mt-1">ETH volume sent over recent months compared to prior period.</p>
               </div>
               <div className="flex bg-black/20 rounded-lg p-1 border border-white/[0.06] shadow-inner">
                 <button 
@@ -976,8 +988,8 @@ export default function EmployerDashboard() {
                           </code>
                         </TableCell>
                         <TableCell className="text-[13.5px] font-semibold text-foreground font-mono">
-                          {formatXLM(emp.salary)}{" "}
-                          <span className="text-[11px] font-normal text-muted-foreground font-sans">XLM</span>
+                          {formatETH(emp.salary)}{" "}
+                          <span className="text-[11px] font-normal text-muted-foreground font-sans">ETH</span>
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline" className={`text-[11px] font-semibold border ${status.className}`}>
@@ -987,16 +999,8 @@ export default function EmployerDashboard() {
                         <TableCell className="text-[12.5px] text-muted-foreground flex items-center gap-2">
                           {emp.lastPaid || <span className="text-slate-500 italic">Never</span>}
                           {emp.lastPaid && (
-                            <div className="h-6 w-8 relative rounded border border-white/10 overflow-hidden cursor-pointer hover:border-primary/50 transition-colors group/receipt">
-                              <Image 
-                                src="/payslip_receipt.png" 
-                                alt="Receipt Preview" 
-                                fill 
-                                className="object-cover"
-                              />
-                              <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover/receipt:opacity-100 transition-opacity flex items-center justify-center">
-                                <FileText className="h-3 w-3 text-white" />
-                              </div>
+                            <div className="h-6 w-8 relative rounded border border-white/10 bg-white/[0.04] overflow-hidden cursor-pointer hover:border-primary/50 transition-colors group/receipt flex items-center justify-center">
+                              <FileText className="h-3 w-3 text-slate-400 group-hover/receipt:text-white transition-colors" />
                             </div>
                           )}
                         </TableCell>
@@ -1034,7 +1038,7 @@ export default function EmployerDashboard() {
           <DialogHeader>
             <DialogTitle>{editingEmployee ? "Edit Employee" : "Add Team Member"}</DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              Define the employee's public Stellar wallet and monthly XLM salary.
+              Define the employee's public EVM wallet and monthly ETH salary.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-5 py-4">
@@ -1048,15 +1052,15 @@ export default function EmployerDashboard() {
             </div>
             <div className="grid gap-2">
               <Label>Wallet Address</Label>
-              <Input placeholder="G..." value={formWallet} onChange={(e) => setFormWallet(e.target.value)} className="font-mono bg-background border-border/20 text-[13px]" />
+              <Input placeholder="0x…" value={formWallet} onChange={(e) => setFormWallet(e.target.value)} className="font-mono bg-background border-border/20 text-[13px]" />
             </div>
             <div className="grid gap-2">
               <Label>Monthly Salary ({currency})</Label>
               <div className="relative">
-                <Input type="number" placeholder="e.g. 500" value={formSalary} onChange={(e) => setFormSalary(e.target.value)} className={`font-mono bg-background border-border/20 text-[13px] ${currency === 'XLM' ? 'pr-28' : ''}`} />
-                {currency === 'XLM' && (
+                <Input type="number" placeholder="e.g. 500" value={formSalary} onChange={(e) => setFormSalary(e.target.value)} className={`font-mono bg-background border-border/20 text-[13px] ${currency === 'ETH' ? 'pr-28' : ''}`} />
+                {currency === 'ETH' && (
                   <div className="absolute right-3 top-2.5 text-[11px] text-muted-foreground flex items-center gap-1.5">
-                    ≈ ${(Number(formSalary || 0) * xlmUsdRate).toFixed(2)} 
+                    ≈ ${(Number(formSalary || 0) * ethUsdRate).toFixed(2)} 
                     <Activity className="h-3 w-3 cursor-pointer hover:text-cyan transition-colors" onClick={refreshRate} />
                   </div>
                 )}
@@ -1108,16 +1112,16 @@ export default function EmployerDashboard() {
                 </div>
                 <div className="flex justify-between items-center text-[13.5px]">
                   <span className="text-muted-foreground font-medium">Total Disbursement</span>
-                  <span className="font-bold text-foreground font-mono">{formatXLM(totalDisbursed)} XLM</span>
+                  <span className="font-bold text-foreground font-mono">{formatETH(totalDisbursed)} ETH</span>
                 </div>
                 <div className="flex justify-between items-center text-[13.5px]">
                   <span className="text-muted-foreground font-medium">Base Network Fee</span>
-                  <span className="font-bold text-amber-400 font-mono">~ {estimatedFee.toFixed(5)} XLM</span>
+                  <span className="font-bold text-amber-400 font-mono">~ {estimatedFee.toFixed(5)} ETH</span>
                 </div>
                 <div className="border-t border-border/20 pt-4 mt-2 flex justify-between items-center">
                   <span className="text-[15px] font-semibold text-foreground">Total Required</span>
                   <span className="text-[18px] font-extrabold text-foreground font-mono text-primary">
-                    {formatXLM(totalDisbursed + estimatedFee)} <span className="text-[12px] text-muted-foreground font-sans">XLM</span>
+                    {formatETH(totalDisbursed + estimatedFee)} <span className="text-[12px] text-muted-foreground font-sans">ETH</span>
                   </span>
                 </div>
               </div>

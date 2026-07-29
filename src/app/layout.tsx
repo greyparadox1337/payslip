@@ -18,8 +18,8 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Payslip — Stellar Payments",
-  description: "Send payslips and XLM payments on the Stellar network",
+  title: "Payslip — Robinhood Chain Payments",
+  description: "Send payslips and ETH payments on the Robinhood Chain",
 };
 
 export default function RootLayout({

@@ -10,18 +10,18 @@ const OPEN_ROLES = [
     title: 'Frontend Developer',
     dept: 'Engineering',
     color: 'indigo',
-    details: 'Remote · Full-time · Competitive salary in XLM + USD',
+    details: 'Remote · Full-time · Competitive salary in ETH + USD',
     description: 'Help us build the next generation of global payroll dashboards. You will be responsible for crafting high-performance, accessible, and stunning user interfaces using modern web technologies.',
     skills: ['React', 'Next.js', 'TypeScript', 'TailwindCSS'],
   },
   {
     id: 'blockchain',
-    title: 'Stellar/Blockchain Developer',
+    title: 'Robinhood Chain/Blockchain Developer',
     dept: 'Engineering',
     color: 'cyan',
     details: 'Remote · Part-time or Full-time',
-    description: 'Design and implement secure, efficient smart contracts on Stellar Soroban. You will bridge the gap between traditional finance and decentralized on-chain settlements.',
-    skills: ['Stellar SDK', 'Soroban', 'TypeScript', 'Smart Contracts'],
+    description: 'Design and implement secure, efficient smart contracts on Robinhood Chain. You will bridge the gap between traditional finance and decentralized on-chain settlements.',
+    skills: ['viem', 'Solidity', 'TypeScript', 'Smart Contracts'],
   },
   {
     id: 'design',
@@ -44,7 +44,7 @@ const OPEN_ROLES = [
 ]
 
 const BENEFITS = [
-  { title: 'Paid in XLM', desc: 'Optional crypto salaries via Stellar.', icon: Coins, color: 'text-amber-400', bg: 'bg-amber-400/10' },
+  { title: 'Paid in ETH', desc: 'Optional crypto salaries via Robinhood Chain.', icon: Coins, color: 'text-amber-400', bg: 'bg-amber-400/10' },
   { title: 'Remote First', desc: 'Work from anywhere in the world.', icon: Globe, color: 'text-cyan-400', bg: 'bg-cyan-400/10' },
   { title: 'Equity', desc: 'Stock options for early employees.', icon: Rocket, color: 'text-violet-400', bg: 'bg-violet-400/10' },
   { title: 'Move Fast', desc: 'Iterate daily on modern tech stacks.', icon: Zap, color: 'text-sky-400', bg: 'bg-sky-400/10' },
@@ -69,7 +69,7 @@ export default function CareersPage() {
               </span>
             </h1>
             <p className="text-slate-400 text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed">
-              Remote-first, async-friendly, and obsessed with blockchain technology. Join our mission to modernize payments on the Stellar network.
+              Remote-first, async-friendly, and obsessed with blockchain technology. Join our mission to modernize payments on the Robinhood Chain.
             </p>
           </div>
         </section>
@@ -134,7 +134,7 @@ function RoleCard({ role }: { role: typeof OPEN_ROLES[0] }) {
       <div className="flex flex-wrap gap-4 text-xs text-slate-400 mb-6">
         <span className="flex items-center gap-1.5"><Globe className="h-3.5 w-3.5" /> Remote</span>
         <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> {role.details.split(' · ')[1]}</span>
-        <span className="flex items-center gap-1.5"><DollarSign className="h-3.5 w-3.5" /> {role.id === 'frontend' ? 'XLM + USD' : 'Competitive'}</span>
+        <span className="flex items-center gap-1.5"><DollarSign className="h-3.5 w-3.5" /> {role.id === 'frontend' ? 'ETH + USD' : 'Competitive'}</span>
       </div>
 
       <p className="text-sm text-slate-400 leading-relaxed mb-8 line-clamp-2">

@@ -21,7 +21,7 @@ export default function ScreenshotsPage() {
           </h1>
         </div>
         <p className="text-slate-400 text-lg mb-6">
-          Use this page to capture all required submission screenshots for the Stellar Builder Track.
+          Use this page to capture all required submission screenshots for the Robinhood Chain Builder Track.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-indigo-500/10 border border-indigo-500/20 p-4 rounded-xl flex gap-3 italic text-sm">
@@ -50,20 +50,20 @@ export default function ScreenshotsPage() {
             <div className="p-12 text-center space-y-6">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-indigo-400 text-xs font-bold uppercase tracking-wider">
                 <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" />
-                Freighter Connected
+                MetaMask Connected
               </div>
               <div className="space-y-2">
                 <p className="text-slate-400 text-sm font-medium">Connected Wallet</p>
                 <p className="text-2xl font-mono text-white opacity-80">GDEMO...ADDR</p>
               </div>
               <div className="space-y-2">
-                <p className="text-slate-400 text-sm font-medium">XLM Balance</p>
+                <p className="text-slate-400 text-sm font-medium">ETH Balance</p>
                 <div className="text-6xl font-black text-indigo-400 tracking-tighter">
-                  9,842.4231 <span className="text-2xl text-slate-500">XLM</span>
+                  9,842.4231 <span className="text-2xl text-slate-500">ETH</span>
                 </div>
               </div>
               <div className="inline-block px-4 py-1 bg-indigo-600 text-white rounded text-xs font-bold uppercase tracking-widest">
-                Stellar Testnet
+                Robinhood Chain Testnet
               </div>
             </div>
           </Card>
@@ -82,9 +82,9 @@ export default function ScreenshotsPage() {
           <Card className="p-24 flex flex-col items-center justify-center border-indigo-500/30 bg-[#161633] shadow-2xl space-y-8">
             <div className="text-center space-y-2">
               <h3 className="text-7xl font-black text-indigo-400 tracking-tighter">
-                9,842.4231 XLM
+                9,842.4231 ETH
               </h3>
-              <p className="text-slate-400 text-lg uppercase tracking-widest font-medium">Available on Stellar Testnet</p>
+              <p className="text-slate-400 text-lg uppercase tracking-widest font-medium">Available on Robinhood Chain Testnet</p>
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-lg border border-white/10 text-xs text-slate-400">
@@ -111,16 +111,16 @@ export default function ScreenshotsPage() {
           <div className="flex justify-center p-12 bg-indigo-500/5 rounded-3xl border border-indigo-500/10">
             <TransactionSuccessCard 
               title="Payroll Sent!"
-              subtitle="Employee salaries paid on Stellar Testnet"
+              subtitle="Employee salaries paid on Robinhood Chain Testnet"
               txHash={demoTxHash}
-              amount="2,500 XLM"
+              amount="2,500 ETH"
               walletAddress="GDEMO...ADDR"
-              walletBalance="9,341.2847 XLM"
+              walletBalance="9,341.2847 ETH"
               extraDetails={[
                 { label: "Employees Paid", value: "5" },
                 { label: "Pay Period", value: "March 2025" },
-                { label: "Asset", value: "XLM (Native)" },
-                { label: "Network", value: "Stellar Testnet" }
+                { label: "Asset", value: "ETH (Native)" },
+                { label: "Network", value: "Robinhood Chain Testnet" }
               ]}
               onClose={() => {}}
             />

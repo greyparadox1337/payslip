@@ -6,6 +6,7 @@ import { Check, Copy, ExternalLink, X, Wallet, ArrowRight, Clock, Hash, Activity
 import { Confetti } from '../Confetti' // Adapted path
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { explorerTxUrl } from '@/lib/chains'
 
 interface TransactionSuccessCardProps {
   title: string
@@ -28,7 +29,7 @@ export default function TransactionSuccessCard({
   amount,
   walletAddress,
   walletBalance,
-  network = "Stellar Testnet",
+  network = "Robinhood Chain Testnet",
   timestamp = new Date().toLocaleString(),
   extraDetails,
   onClose,
@@ -133,7 +134,7 @@ export default function TransactionSuccessCard({
             <div className="flex items-center justify-between">
               <div className="text-sm text-muted-foreground">Wallet Balance</div>
               <div className="text-2xl font-bold text-indigo-500">
-                {walletBalance || "0.00"} <span className="text-sm font-medium text-muted-foreground">XLM</span>
+                {walletBalance || "0.00"} <span className="text-sm font-medium text-muted-foreground">ETH</span>
               </div>
             </div>
           </div>
@@ -154,7 +155,7 @@ export default function TransactionSuccessCard({
             {amount && (
               <div className="flex justify-between items-center text-sm">
                 <span className="text-muted-foreground flex items-center gap-2"><Activity size={14} /> Amount</span>
-                <span className="font-bold text-white">{amount} XLM</span>
+                <span className="font-bold text-white">{amount} ETH</span>
               </div>
             )}
 
@@ -187,7 +188,7 @@ export default function TransactionSuccessCard({
             </Button>
             <Button 
               onClick={() => {
-                window.open(`https://stellar.expert/explorer/testnet/tx/${txHash}`, '_blank')
+                window.open(explorerTxUrl(txHash), '_blank')
                 onViewExplorer?.()
               }}
               className="rounded-xl flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-violet-500 text-white"

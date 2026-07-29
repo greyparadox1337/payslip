@@ -11,7 +11,7 @@ import {
   LogOut, 
   ExternalLink 
 } from "lucide-react";
-import { checkFreighterConnection, connectWallet } from "@/lib/stellar";
+import { checkWalletConnection, connectWallet } from "@/lib/chain";
 import { useToast } from "@/contexts/ToastContext";
 
 function truncateAddress(address: string) {
@@ -22,7 +22,7 @@ function truncateAddress(address: string) {
 export function WalletButton() {
   const { data: session, update } = useSession();
   const { addToast } = useToast();
-  const [freighterInstalled, setFreighterInstalled] = useState<boolean | null>(null);
+  const [walletInstalled, setWalletInstalled] = useState<boolean | null>(null);
   const [address, setAddress] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -30,20 +30,20 @@ export function WalletButton() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Check Freighter presence
-    const checkFreighter = async () => {
+    // Check MetaMask presence
+    const checkWallet = async () => {
       try {
-        const connected = await checkFreighterConnection();
-        setFreighterInstalled(true);
+        const connected = await checkWalletConnection();
+        setWalletInstalled(true);
         if (connected) {
           const pubKey = await connectWallet();
           setAddress(pubKey);
         }
       } catch (err) {
-        setFreighterInstalled(false); // Throws or fails if completely missing
+        setWalletInstalled(false); // Throws or fails if completely missing
       }
     };
-    checkFreighter();
+    checkWallet();
 
     // Setup listener to click-outside for dropdown
     const handleClickOutside = (e: MouseEvent) => {
@@ -56,7 +56,7 @@ export function WalletButton() {
   }, []);
 
   const handleConnect = async () => {
-    if (!freighterInstalled) return; // Prevent connecting if not installed
+    if (!walletInstalled) return; // Prevent connecting if not installed
     
     setIsConnecting(true);
     try {
@@ -80,7 +80,7 @@ export function WalletButton() {
         }
       }
 
-      addToast(`Connected to Stellar Testnet · ${truncateAddress(pubKey)}`, "success");
+      addToast(`Connected to Robinhood Chain Testnet · ${truncateAddress(pubKey)}`, "success");
     } catch (err) {
       addToast("Connection request rejected or failed", "error");
     } finally {
@@ -107,16 +107,16 @@ export function WalletButton() {
     setDropdownOpen(false);
   };
 
-  if (freighterInstalled === false) {
+  if (walletInstalled === false) {
     return (
       <div className="relative group w-full">
         <a 
-          href="https://freighter.app" 
+          href="https://metamask.io/download" 
           target="_blank" 
           rel="noopener noreferrer"
         >
           <button className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg text-sm font-medium hover:bg-red-500/20 transition-colors">
-            Install Freighter
+            Install MetaMask
             <ExternalLink className="h-4 w-4" />
           </button>
         </a>
@@ -144,7 +144,7 @@ export function WalletButton() {
         ) : (
           <>
             <Wallet className="h-4 w-4" />
-            Connect Freighter
+            Connect MetaMask
           </>
         )}
       </button>

@@ -1,16 +1,17 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { getXLMBalance } from '@/lib/stellar'
+import { getNativeBalance } from '@/lib/chain'
 import { Button } from '@/components/ui/button'
 import { RefreshCw, Send, ExternalLink, Wallet } from 'lucide-react'
-import SendXLMPanel from './SendXLMPanel'
+import SendPanel from './SendPanel'
 import { Badge } from '@/components/ui/badge'
 import {
   Dialog,
   DialogContent,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { explorerAddressUrl } from '@/lib/chains'
 
 export default function WalletStatusBar() {
   const [address, setAddress] = useState('')
@@ -18,7 +19,7 @@ export default function WalletStatusBar() {
   const [isRefreshing, setIsRefreshing] = useState(false)
 
   useEffect(() => {
-    const savedAddress = localStorage.getItem('stellar_address')
+    const savedAddress = localStorage.getItem('wallet_address')
     if (savedAddress) {
       setAddress(savedAddress)
       refresh()
@@ -26,11 +27,11 @@ export default function WalletStatusBar() {
   }, [])
 
   const refresh = async () => {
-    const savedAddress = localStorage.getItem('stellar_address')
+    const savedAddress = localStorage.getItem('wallet_address')
     if (!savedAddress) return
     
     setIsRefreshing(true)
-    const bal = await getXLMBalance(savedAddress)
+    const bal = await getNativeBalance(savedAddress)
     setBalance(bal)
     setTimeout(() => setIsRefreshing(false), 800)
   }
@@ -56,7 +57,7 @@ export default function WalletStatusBar() {
               <span className="text-lg font-black tracking-tighter text-primary">
                 {balance !== null ? balance.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 }) : '---'}
               </span>
-              <span className="text-[10px] font-bold text-muted-foreground">XLM</span>
+              <span className="text-[10px] font-bold text-muted-foreground">ETH</span>
               <button 
                 onClick={refresh} 
                 disabled={isRefreshing}
@@ -67,7 +68,7 @@ export default function WalletStatusBar() {
               </button>
             </div>
             <Badge variant="outline" className="h-4 text-[8px] font-black uppercase tracking-tighter p-0 text-muted-foreground border-none">
-              Stellar Testnet
+              Robinhood Chain Testnet
             </Badge>
           </div>
         </div>
@@ -79,11 +80,11 @@ export default function WalletStatusBar() {
             <DialogTrigger asChild>
               <Button size="sm" className="bg-primary text-white h-9 px-4 font-bold tracking-tight shadow-lg shadow-primary/20">
                 <Send className="h-3.5 w-3.5 mr-2" />
-                Send XLM
+                Send ETH
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[480px] p-0 border-none bg-transparent shadow-none">
-              <SendXLMPanel />
+              <SendPanel />
             </DialogContent>
           </Dialog>
 
@@ -91,7 +92,7 @@ export default function WalletStatusBar() {
             variant="ghost" 
             size="icon" 
             className="h-9 w-9 text-muted-foreground hover:text-primary hover:bg-primary/5"
-            onClick={() => window.open(`https://stellar.expert/explorer/testnet/account/${address}`, '_blank')}
+            onClick={() => window.open(explorerAddressUrl(address), '_blank')}
           >
             <ExternalLink className="h-4 w-4" />
           </Button>

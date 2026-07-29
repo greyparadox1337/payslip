@@ -31,18 +31,18 @@ import {
 import DashboardSkeleton from "@/components/DashboardSkeleton";
 
 const MONTHLY_DATA = [
-  { name: 'Jan', xlm: 4000, usdc: 2400 },
-  { name: 'Feb', xlm: 3000, usdc: 1398 },
-  { name: 'Mar', xlm: 2000, usdc: 9800 },
-  { name: 'Apr', xlm: 2780, usdc: 3908 },
-  { name: 'May', xlm: 1890, usdc: 4800 },
-  { name: 'Jun', xlm: 2390, usdc: 3800 },
-  { name: 'Jul', xlm: 3490, usdc: 4300 },
+  { name: 'Jan', eth: 4000, usdc: 2400 },
+  { name: 'Feb', eth: 3000, usdc: 1398 },
+  { name: 'Mar', eth: 2000, usdc: 9800 },
+  { name: 'Apr', eth: 2780, usdc: 3908 },
+  { name: 'May', eth: 1890, usdc: 4800 },
+  { name: 'Jun', eth: 2390, usdc: 3800 },
+  { name: 'Jul', eth: 3490, usdc: 4300 },
 ];
 
 const ASSET_DATA = [
   { name: 'USDC', value: 65 },
-  { name: 'XLM', value: 35 },
+  { name: 'ETH', value: 35 },
 ];
 
 const EMPLOYEE_DATA = [
@@ -116,11 +116,11 @@ export default function AnalyticsPage() {
                  <TrendingUp className="h-5 w-5 text-indigo-400" />
                  Total Disbursements
               </h2>
-              <p className="text-xs text-muted-foreground mt-1">Volume tracking across XLM and USDC liquidity pools.</p>
+              <p className="text-xs text-muted-foreground mt-1">Volume tracking across ETH and USDC liquidity pools.</p>
             </div>
             <div className="flex items-center gap-2 bg-white/5 p-1.5 rounded-lg border border-white/10">
                <div className="h-2 w-2 rounded-full bg-indigo-500"></div>
-               <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest leading-none">XLM</span>
+               <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest leading-none">ETH</span>
             </div>
           </div>
           
@@ -128,7 +128,7 @@ export default function AnalyticsPage() {
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={MONTHLY_DATA} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
                 <defs>
-                  <linearGradient id="colorXlm" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient id="colorEth" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
                     <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
                   </linearGradient>
@@ -153,7 +153,7 @@ export default function AnalyticsPage() {
                   contentStyle={{ backgroundColor: '#0f172a', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 10px 40px rgba(0,0,0,0.5)' }}
                   itemStyle={{ color: '#fff', fontSize: '13px', fontWeight: '800' }}
                 />
-                <Area type="monotone" dataKey="xlm" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorXlm)" />
+                <Area type="monotone" dataKey="eth" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorEth)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -237,7 +237,7 @@ export default function AnalyticsPage() {
                </div>
                <div className="flex items-center gap-2">
                   <div className="h-2 w-2 rounded-full bg-indigo-500"></div>
-                  <span className="text-xs font-bold text-slate-300">XLM</span>
+                  <span className="text-xs font-bold text-slate-300">ETH</span>
                </div>
             </div>
         </div>
@@ -249,7 +249,7 @@ export default function AnalyticsPage() {
                Smart Insight
             </div>
             <h3 className="text-2xl md:text-3xl font-black text-white mb-4 tracking-tighter leading-tight">
-               Your organisation saved <span className="text-cyan-400">$3,420</span> in settlement fees this quarter using Stellar.
+               Your organisation saved <span className="text-cyan-400">$3,420</span> in settlement fees this quarter using Robinhood Chain.
             </h3>
             <p className="text-lg text-slate-400 max-w-xl leading-relaxed mb-8">
                By bypassing traditional bank rails, PaySlip reduced your cross-border friction from 3.5% to <span className="font-bold text-white">0.05%</span>.

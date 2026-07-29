@@ -16,8 +16,8 @@ interface BlogPost {
 
 const MOCK_POSTS: BlogPost[] = [
   {
-    slug: "how-stellar-makes-payroll-cheaper",
-    title: "How Stellar makes global payroll 100x cheaper",
+    slug: "how-robinhood-chain-makes-payroll-cheaper",
+    title: "How Robinhood Chain makes global payroll 100x cheaper",
     category: "sky",
     date: "March 15, 2025",
     readTime: "4 min",
@@ -25,28 +25,28 @@ const MOCK_POSTS: BlogPost[] = [
     content: `
       In the traditional world of finance, sending money across borders is a slow, expensive, and opaque process. For businesses with global teams, payroll is a repeating nightmare of 3-5% transfer fees, unfavorable exchange rates, and 3-5 day waiting periods.
       
-      Enter the Stellar network. Unlike traditional banking rails, Stellar was built specifically for moving money across borders at the speed of the internet. By using Stellar as the underlying settlement layer, PaySlip is able to reduce global payroll costs by up to 98%.
+      Enter the Robinhood Chain. Unlike traditional banking rails, Robinhood Chain was built specifically for moving money across borders at the speed of the internet. By using Robinhood Chain as the underlying settlement layer, PaySlip is able to reduce global payroll costs by up to 98%.
       
-      The secret lies in Stellar’s efficient consensus mechanism. Transactions settle in 3-5 seconds with fees that are a fraction of a cent. For a company paying 50 employees in 20 different countries, the savings are astronomical. Not only are the fees lower, but the transparency is absolute. Every payment can be tracked on-chain, eliminating the "your check is in the mail" excuses.
+      The secret lies in Robinhood Chain’s efficient consensus mechanism. Transactions settle in 3-5 seconds with fees that are a fraction of a cent. For a company paying 50 employees in 20 different countries, the savings are astronomical. Not only are the fees lower, but the transparency is absolute. Every payment can be tracked on-chain, eliminating the "your check is in the mail" excuses.
       
       PaySlip abstracts the complexity of the blockchain, allowing employers to fund payroll in local currencies or stablecoins, while employees receive their earnings in their preferred digital asset instantly. This isn't just an improvement; it's a paradigm shift in how we think about work and compensation in a globalized economy.
     `
   },
   {
-    slug: "xlm-vs-usdc-for-payroll",
-    title: "XLM or USDC — which is better for paying your team?",
+    slug: "eth-vs-usdc-for-payroll",
+    title: "ETH or USDC — which is better for paying your team?",
     category: "amber",
     date: "March 22, 2025",
     readTime: "3 min",
     author: "Mark S. Scout",
     content: `
-      A common question we get at PaySlip is whether it's better to pay employees in XLM (Stellar's native asset) or USDC (the world’s leading digital dollar). Both have distinct advantages depending on your company's structure and your employees' preferences.
+      A common question we get at PaySlip is whether it's better to pay employees in ETH (Robinhood Chain's native asset) or USDC (the world’s leading digital dollar). Both have distinct advantages depending on your company's structure and your employees' preferences.
       
-      XLM is the "gas" of the Stellar network. It is inherently fast and offers the highest liquidity within the Stellar ecosystem. For employees who are crypto-native and comfortable with volatility, XLM can be an excellent choice for immediate trading or long-term holding. However, for many workers, the price fluctuations of XLM compared to their local cost of living can be a deterrent.
+      ETH is the "gas" of the Robinhood Chain. It is inherently fast and offers the highest liquidity within the Robinhood Chain ecosystem. For employees who are crypto-native and comfortable with volatility, ETH can be an excellent choice for immediate trading or long-term holding. However, for many workers, the price fluctuations of ETH compared to their local cost of living can be a deterrent.
       
-      USDC on Stellar offers the best of both worlds: the stability of the US Dollar combined with the speed and low cost of the Stellar network. USDC is fully reserved and always redeemable 1:1 for US dollars. For the majority of international teams, USDC provides the stability they need to pay rent, buy groceries, and plan their futures without worrying about the daily movements of the crypto market.
+      USDC on Robinhood Chain offers the best of both worlds: the stability of the US Dollar combined with the speed and low cost of the Robinhood Chain. USDC is fully reserved and always redeemable 1:1 for US dollars. For the majority of international teams, USDC provides the stability they need to pay rent, buy groceries, and plan their futures without worrying about the daily movements of the crypto market.
       
-      At PaySlip, we recommend a hybrid approach. Many of our forward-thinking clients offer their teams a "payment split," allowing them to receive a portion of their salary in USDC for stability and a portion in XLM for its utility within the network.
+      At PaySlip, we recommend a hybrid approach. Many of our forward-thinking clients offer their teams a "payment split," allowing them to receive a portion of their salary in USDC for stability and a portion in ETH for its utility within the network.
     `
   },
   {
@@ -57,13 +57,13 @@ const MOCK_POSTS: BlogPost[] = [
     readTime: "5 min",
     author: "Parth Karan",
     content: `
-      Hackathons are often described as pressure cookers for innovation. When we started building PaySlip, we had 48 hours to take a complex problem—global payroll—and solve it using the Stellar SDK.
+      Hackathons are often described as pressure cookers for innovation. When we started building PaySlip, we had 48 hours to take a complex problem—global payroll—and solve it using the viem.
       
-      The challenge wasn't just writing code; it was designing a user experience that made blockchain invisible. We spent the first 6 hours purely on architecture, ensuring our MongoDB schema could handle the many-to-many relationships between organisations, employers, and employees while maintaining cryptographic links to Stellar wallets.
+      The challenge wasn't just writing code; it was designing a user experience that made blockchain invisible. We spent the first 6 hours purely on architecture, ensuring our MongoDB schema could handle the many-to-many relationships between organisations, employers, and employees while maintaining cryptographic links to EVM wallets.
       
-      Integration with the Freighter API was our first major technical hurdle. We needed a secure way for employers to sign bulk transactions without ever sharing their private keys. By leveraging Stellar's multisig capabilities and the security of Freighter, we constructed a "Payroll Runner" that feels as simple as clicking a button but executes multi-stage on-chain logic.
+      Integration with the EIP-1193 wallet API was our first major technical hurdle. We needed a secure way for employers to sign bulk transactions without ever sharing their private keys. By leveraging Robinhood Chain's multisig capabilities and the security of MetaMask, we constructed a "Payroll Runner" that feels as simple as clicking a button but executes multi-stage on-chain logic.
       
-      One of the biggest lessons learned was the importance of "empty states" and "loading boundaries." In a blockchain app, waiting for a ledger to close is inevitable. We focused heavily on the visual feedback—using pulsing orbs and shimmer effects—to ensure the user always knew their money was moving. PaySlip is a testament to what a focused team can achieve when they combine modern web frameworks like Next.js with robust blockchain protocols like Stellar.
+      One of the biggest lessons learned was the importance of "empty states" and "loading boundaries." In a blockchain app, waiting for a ledger to close is inevitable. We focused heavily on the visual feedback—using pulsing orbs and shimmer effects—to ensure the user always knew their money was moving. PaySlip is a testament to what a focused team can achieve when they combine modern web frameworks like Next.js with robust blockchain protocols like Robinhood Chain.
     `
   }
 ];

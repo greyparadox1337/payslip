@@ -24,7 +24,7 @@ export default function PrivacyPage() {
                 Data We Collect
               </h2>
               <p className="text-slate-300 leading-relaxed text-[15px]">
-                PaySlip collects basic account information, including your full name, email address, and cryptographically hashed passwords. For employers, we also collect organisation details and Stellar public keys. We do not store private keys, seed phrases, or sensitive biometric data.
+                PaySlip collects basic account information, including your full name, email address, and cryptographically hashed passwords. For employers, we also collect organisation details and Robinhood Chain public keys. We do not store private keys, seed phrases, or sensitive biometric data.
               </p>
             </section>
 
@@ -34,17 +34,17 @@ export default function PrivacyPage() {
                 How We Use Your Data
               </h2>
               <p className="text-slate-300 leading-relaxed text-[15px]">
-                Your data is primarily used to provide, maintain, and optimize the PaySlip service. This includes processing payroll events on the Stellar network, generating digitally signed PDF payslips, and notifying you of transaction statuses. We do not sell your personal information to third-party data brokers.
+                Your data is primarily used to provide, maintain, and optimize the PaySlip service. This includes processing payroll events on the Robinhood Chain, generating digitally signed PDF payslips, and notifying you of transaction statuses. We do not sell your personal information to third-party data brokers.
               </p>
             </section>
 
             <section>
               <h2 className="text-xl font-bold text-violet-400 mb-4 tracking-tight flex items-center gap-2">
                 <div className="h-1.5 w-1.5 rounded-full bg-violet-500"></div> 
-                Stellar Blockchain Data
+                Robinhood Chain Blockchain Data
               </h2>
               <p className="text-slate-300 leading-relaxed text-[15px]">
-                Transactions initiated via PaySlip are recorded on the public Stellar blockchain. This includes public wallet addresses, transaction amounts, and timestamps. Please note that data on a public ledger is immutable and visible to anyone with access to the network or a block explorer.
+                Transactions initiated via PaySlip are recorded on the public Robinhood Chain. This includes public wallet addresses, transaction amounts, and timestamps. Please note that data on a public ledger is immutable and visible to anyone with access to the network or a block explorer.
               </p>
             </section>
 

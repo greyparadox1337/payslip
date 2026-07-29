@@ -3,8 +3,8 @@
 export const dynamic = 'force-dynamic';
 
 import React, { useState, useCallback, useEffect } from "react";
-import Image from "next/image";
 import {
+  FileText,
   Wallet,
   ExternalLink,
   LogOut,
@@ -25,15 +25,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 import {
   connectWallet,
-  checkFreighterConnection,
+  checkWalletConnection,
   getTransactionHistory,
   type PaymentRecord,
-} from "@/lib/stellar";
+} from "@/lib/chain";
 import WalletManager from "@/components/shared/WalletManager";
-import SendXLMPanel from "@/components/shared/SendXLMPanel";
+import SendPanel from "@/components/shared/SendPanel";
 import { History } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { formatDistanceToNow } from "date-fns";
+import { explorerTxUrl, EXPLORER_URL } from '@/lib/chains';
 
 /* ─────────────────────────────────────────────
  *  Helpers
@@ -44,7 +45,7 @@ function truncateAddress(addr: string) {
   return `${addr.slice(0, 6)}…${addr.slice(-6)}`;
 }
 
-function formatXLM(amount: string) {
+function formatETH(amount: string) {
   const num = parseFloat(amount);
   return new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 2,
@@ -66,8 +67,8 @@ function formatMonth(iso: string) {
   return d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 }
 
-function stellarExpertUrl(txHash: string) {
-  return `https://stellar.expert/explorer/testnet/tx/${txHash}`;
+function explorerUrl(txHash: string) {
+  return explorerTxUrl(txHash);
 }
 
 /* ─────────────────────────────────────────────
@@ -112,7 +113,7 @@ function ConnectScreen({
                 Connect Your Wallet
               </h2>
               <p className="text-[13.5px] text-muted-foreground mt-1.5 leading-relaxed">
-                Sign in securely with your Freighter wallet.
+                Sign in securely with your MetaMask wallet.
                 <br />
                 No passwords needed — your wallet is your identity.
               </p>
@@ -135,20 +136,20 @@ function ConnectScreen({
               ) : (
                 <Wallet className="h-5 w-5" />
               )}
-              {loading ? "Connecting…" : "Connect Freighter Wallet"}
+              {loading ? "Connecting…" : "Connect MetaMask Wallet"}
             </Button>
 
             <div className="flex items-center gap-2 justify-center mt-5 text-[12px] text-slate-400">
               <ShieldCheck className="h-3.5 w-3.5" />
-              Secured by Stellar Network · Testnet
+              Secured by Robinhood Chain Network · Testnet
             </div>
           </CardContent>
         </Card>
 
         <p className="text-center text-[12px] text-slate-400 mt-5">
-          Don&apos;t have Freighter?{" "}
+          Don&apos;t have MetaMask?{" "}
           <a
-            href="https://freighter.app"
+            href="https://metamask.io/download"
             target="_blank"
             rel="noopener noreferrer"
             className="text-indigo-500 hover:text-indigo-600 underline underline-offset-2"
@@ -223,9 +224,9 @@ function PayslipCard({ record }: { record: PaymentRecord }) {
               </div>
               <div className="text-right shrink-0">
                 <p className="text-[17px] font-bold text-foreground font-mono">
-                  {formatXLM(record.amount)}
+                  {formatETH(record.amount)}
                   <span className="text-[12px] font-medium text-muted-foreground ml-1 font-sans">
-                    XLM
+                    ETH
                   </span>
                 </p>
               </div>
@@ -243,13 +244,13 @@ function PayslipCard({ record }: { record: PaymentRecord }) {
                 </Badge>
                 
                 <a
-                  href={stellarExpertUrl(record.transactionHash)}
+                  href={explorerUrl(record.transactionHash)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-[12px] font-medium text-primary hover:text-primary/80 transition-colors"
                   id={`view-tx-${record.id}`}
                 >
-                  View on Stellar Expert
+                  View on Robinhood Chain Expert
                   <ExternalLink className="h-3 w-3" />
                 </a>
               </div>
@@ -312,13 +313,9 @@ function PayslipSkeleton() {
 function EmptyPayslips() {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4">
-      <Image
-        src="/empty-payslips.png"
-        alt="No payslips found"
-        width={180}
-        height={180}
-        className="mb-6 opacity-90"
-      />
+      <div className="mb-6 h-[120px] w-[120px] rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center">
+        <FileText className="h-12 w-12 text-slate-400" strokeWidth={1.5} />
+      </div>
       <h3 className="text-lg font-semibold text-slate-800">
         No payslips yet
       </h3>
@@ -380,10 +377,10 @@ export default function EmployeePortal() {
     setLoading(true);
     setError(null);
     try {
-      const connected = await checkFreighterConnection();
+      const connected = await checkWalletConnection();
       if (!connected) {
         setError(
-          "Freighter wallet not detected. Please install the Freighter browser extension first."
+          "MetaMask wallet not detected. Please install the MetaMask browser extension first."
         );
         setLoading(false);
         return;
@@ -510,10 +507,10 @@ export default function EmployeePortal() {
               ) : (
                 <>
                   <span className="text-[32px] font-bold tracking-tight font-mono">
-                    {formatXLM(String(totalReceived))}
+                    {formatETH(String(totalReceived))}
                   </span>
                   <span className="text-[15px] text-muted-foreground font-medium">
-                    XLM
+                    ETH
                   </span>
                 </>
               )}
@@ -538,18 +535,18 @@ export default function EmployeePortal() {
                   Network
                 </p>
                 <p className="text-[13px] font-medium mt-1 text-indigo-200/80">
-                  Stellar Testnet
+                  Robinhood Chain Testnet
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Stellar Wallet Section */}
+        {/* Robinhood Chain Wallet Section */}
         <div className="grid grid-cols-1 gap-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <WalletManager />
-            <SendXLMPanel compact />
+            <SendPanel compact />
           </div>
           <Card className="bg-card border-border/20 shadow-xl overflow-hidden">
             <CardHeader className="py-4 border-b border-border/10 bg-muted/30">
@@ -568,12 +565,12 @@ export default function EmployeePortal() {
                             <ArrowDownLeft className="h-4 w-4" />
                           </div>
                           <div>
-                            <p className="text-xs font-bold">XLM Received</p>
+                            <p className="text-xs font-bold">ETH Received</p>
                             <p className="text-[10px] text-muted-foreground font-mono">{tx.transactionHash.slice(0, 8)}...</p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-xs font-bold text-cyan-500">+{formatXLM(tx.amount)} XLM</p>
+                          <p className="text-xs font-bold text-cyan-500">+{formatETH(tx.amount)} ETH</p>
                           <p className="text-[10px] text-muted-foreground">{formatDate(tx.createdAt)}</p>
                         </div>
                       </div>
@@ -628,27 +625,27 @@ export default function EmployeePortal() {
       <footer className="border-t border-border/20 mt-12 backdrop-blur-sm bg-background/50">
         <div className="mx-auto max-w-2xl px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-[12px] text-muted-foreground">
-            © {new Date().getFullYear()} Payslip · Powered by Stellar
+            © {new Date().getFullYear()} Payslip · Powered by Robinhood Chain
           </p>
           <div className="flex items-center gap-4 text-[12px] text-muted-foreground">
             <a
-              href="https://stellar.org"
+              href="https://docs.robinhood.com/chain/"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-primary transition-colors"
             >
-              Stellar.org
+              Robinhood Chain.org
             </a>
             <a
-              href="https://freighter.app"
+              href="https://metamask.io/download"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-primary transition-colors"
             >
-              Freighter
+              MetaMask
             </a>
             <a
-              href="https://stellar.expert/explorer/testnet"
+              href={EXPLORER_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-primary transition-colors"

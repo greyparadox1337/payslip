@@ -7,12 +7,12 @@ import { Button } from "@/components/ui/button";
 const SLIDES = [
   {
     title: "Welcome to PaySlip",
-    description: "The enterprise-grade payroll system running natively on the Stellar blockchain.",
+    description: "The enterprise-grade payroll system running natively on the Robinhood Chain.",
     icon: <Coins className="h-12 w-12 text-primary" />,
   },
   {
     title: "Connect Your Wallet",
-    description: "Link your Freighter browser extension to securely authorize, sign, and fund global disbursements.",
+    description: "Link your MetaMask browser extension to securely authorize, sign, and fund global disbursements.",
     icon: (
       <div className="flex items-center justify-center space-x-2">
         <div className="h-10 w-10 bg-card rounded-full shadow-lg border-2 border-indigo-500 shrink-0" />
@@ -23,7 +23,7 @@ const SLIDES = [
   },
   {
     title: "Add The Team",
-    description: "Onboard your employees instantly using just their public Stellar wallet addresses. No routing numbers needed.",
+    description: "Onboard your employees instantly using just their public EVM wallet addresses. No routing numbers needed.",
     icon: (
       <div className="grid grid-cols-2 gap-2">
         <div className="h-8 w-8 bg-cyan-500/20 rounded-full border border-cyan-500" />

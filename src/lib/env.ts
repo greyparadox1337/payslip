@@ -18,6 +18,7 @@ export const env = {
   NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET!,
   NEXTAUTH_URL: process.env.NEXTAUTH_URL!,
   RESEND_API_KEY: process.env.RESEND_API_KEY ?? '',
-  STELLAR_NETWORK: process.env.NEXT_PUBLIC_STELLAR_NETWORK ?? 'testnet',
-  STELLAR_HORIZON: process.env.NEXT_PUBLIC_STELLAR_HORIZON ?? 'https://horizon-testnet.stellar.org',
+  CHAIN_ENV: process.env.NEXT_PUBLIC_CHAIN_ENV ?? 'testnet',
+  ROBINHOOD_RPC:
+    process.env.NEXT_PUBLIC_ROBINHOOD_RPC ?? 'https://rpc.testnet.chain.robinhood.com',
 }

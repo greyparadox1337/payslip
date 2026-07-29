@@ -1,7 +1,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['stellar.expert', 'horizon-testnet.stellar.org'],
+    domains: ['explorer.testnet.chain.robinhood.com', 'robinhoodchain.blockscout.com'],
     remotePatterns: [
       { protocol: 'https', hostname: '**.mongodb.net' },
     ],
@@ -22,8 +22,8 @@ const nextConfig = {
     return config
   },
   env: {
-    NEXT_PUBLIC_STELLAR_NETWORK: process.env.NEXT_PUBLIC_STELLAR_NETWORK,
-    NEXT_PUBLIC_STELLAR_HORIZON: process.env.NEXT_PUBLIC_STELLAR_HORIZON,
+    NEXT_PUBLIC_CHAIN_ENV: process.env.NEXT_PUBLIC_CHAIN_ENV,
+    NEXT_PUBLIC_ROBINHOOD_RPC: process.env.NEXT_PUBLIC_ROBINHOOD_RPC,
   },
 }
 module.exports = nextConfig

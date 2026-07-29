@@ -76,7 +76,7 @@ export default function PayrollPage() {
   };
 
   const selectedEmployees = employees.filter(e => selectedIds.includes(e._id));
-  const totalXLM = selectedEmployees.filter(e => e.currency === 'XLM').reduce((sum, e) => sum + e.salary, 0);
+  const totalETH = selectedEmployees.filter(e => e.currency === 'ETH').reduce((sum, e) => sum + e.salary, 0);
   const totalUSDC = selectedEmployees.filter(e => e.currency === 'USDC').reduce((sum, e) => sum + e.salary, 0);
 
   if (loading) return <DashboardSkeleton />;
@@ -121,8 +121,8 @@ export default function PayrollPage() {
             <Wallet className="h-6 w-6 text-cyan-400" />
           </div>
           <div>
-            <div className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest">Total XLM</div>
-            <div className="text-2xl font-black text-white">{totalXLM.toLocaleString()} <span className="text-xs text-muted-foreground">XLM</span></div>
+            <div className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest">Total ETH</div>
+            <div className="text-2xl font-black text-white">{totalETH.toLocaleString()} <span className="text-xs text-muted-foreground">ETH</span></div>
           </div>
         </div>
         <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center gap-5">
@@ -192,7 +192,7 @@ export default function PayrollPage() {
            <div className="flex items-center justify-between gap-6">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <ShieldCheck className="h-4 w-4 text-cyan-500" />
-                Payments are non-custodial and signed via Freighter
+                Payments are non-custodial and signed via MetaMask
               </div>
               <Button 
                 onClick={() => setIsRunning(true)}

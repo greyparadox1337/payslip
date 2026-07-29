@@ -25,7 +25,7 @@ const UserSchema = new Schema<IUser>({
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
   passwordHash: { type: String, required: false },
   role: { type: String, enum: ["employer", "employee"], required: true },
-  linkedWallet: { type: String }, // Optional Stellar Address string
+  linkedWallet: { type: String }, // Optional Robinhood Chain Address string
   joinToken: { type: String, unique: true, sparse: true },
   avatarColor: { type: String, default: "#6366f1" },
   createdAt: { type: Date, default: Date.now },

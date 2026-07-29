@@ -107,7 +107,7 @@ export default function SignupPage() {
                     <Building2 className="h-8 w-8 text-primary" />
                   </div>
                   <h2 className="text-xl font-bold text-foreground mb-2">I'm an employer</h2>
-                  <p className="text-[13px] text-muted-foreground">Pay your team on-chain with XLM securely with zero processing delays.</p>
+                  <p className="text-[13px] text-muted-foreground">Pay your team on-chain with ETH securely with zero processing delays.</p>
                 </button>
 
                 <button 
@@ -154,7 +154,7 @@ export default function SignupPage() {
                   </div>
                   <div>
                     <label className="text-[12px] font-medium text-muted-foreground mb-1 block pl-1">Email Node Address</label>
-                    <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="hello@stellar.org" className="bg-background/50 h-10 border-border/20 text-[14px] focus-visible:ring-1 focus-visible:ring-primary/50" />
+                    <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="hello@example.com" className="bg-background/50 h-10 border-border/20 text-[14px] focus-visible:ring-1 focus-visible:ring-primary/50" />
                   </div>
                   <div>
                     <label className="text-[12px] font-medium text-muted-foreground mb-1 block pl-1">Cryptographic Password</label>

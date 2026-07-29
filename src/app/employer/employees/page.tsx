@@ -39,7 +39,7 @@ interface Employee {
   email?: string;
   walletAddress: string;
   salary: number;
-  currency: "XLM" | "USDC";
+  currency: "ETH" | "USDC";
   status: "active" | "pending" | "inactive";
   createdAt: string;
 }
@@ -57,7 +57,7 @@ export default function EmployeesPage() {
     email: "",
     walletAddress: "",
     salary: "",
-    currency: "XLM" as "XLM" | "USDC"
+    currency: "ETH" as "ETH" | "USDC"
   });
 
   useEffect(() => {
@@ -91,7 +91,7 @@ export default function EmployeesPage() {
       if (res.ok) {
         addToast(`${newEmployee.name} added to payroll`, "success");
         setIsAddModalOpen(false);
-        setNewEmployee({ name: "", email: "", walletAddress: "", salary: "", currency: "XLM" });
+        setNewEmployee({ name: "", email: "", walletAddress: "", salary: "", currency: "ETH" });
         fetchEmployees();
       } else {
         const d = await res.json();
@@ -292,10 +292,10 @@ export default function EmployeesPage() {
                     </div>
                   </div>
                   <div>
-                    <label className="text-[12px] font-bold text-muted-foreground uppercase tracking-wider mb-2 block pl-1">Stellar Wallet Address</label>
+                    <label className="text-[12px] font-bold text-muted-foreground uppercase tracking-wider mb-2 block pl-1">Robinhood Chain Wallet Address</label>
                     <Input 
                       required
-                      placeholder="G..." 
+                      placeholder="0x…" 
                       className="bg-white/[0.03] border-white/10 h-12 font-mono text-sm focus-visible:ring-violet-500/50"
                       value={newEmployee.walletAddress}
                       onChange={(e) => setNewEmployee({...newEmployee, walletAddress: e.target.value})}
@@ -304,7 +304,7 @@ export default function EmployeesPage() {
                   <div>
                     <label className="text-[12px] font-bold text-muted-foreground uppercase tracking-wider mb-2 block pl-1">Preferred Asset</label>
                     <div className="flex p-1 bg-white/[0.03] rounded-xl border border-white/10">
-                      {["XLM", "USDC"].map((curr) => (
+                      {["ETH", "USDC"].map((curr) => (
                         <button
                           key={curr}
                           type="button"

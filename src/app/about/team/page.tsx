@@ -90,7 +90,7 @@ function JoinTeamCard() {
         
         <h3 className="text-xl font-bold mb-3">Your name here?</h3>
         <p className="text-sm text-textMuted leading-relaxed mb-8">
-          We’re scaling fast and looking for remote-first talent. Competitive XLM/USDC salaries.
+          We’re scaling fast and looking for remote-first talent. Competitive ETH/USDC salaries.
         </p>
 
         <Link href="/careers" className="w-full py-3 bg-gradient-to-r from-indigo-500 to-fuchsia-500 text-white rounded-xl text-xs font-bold hover:shadow-indigo-500/25 transition-all">
@@ -107,7 +107,7 @@ export default function TeamPage() {
       name: "Parth Karan",
       role: "Founder / CEO",
       bio: "Former Fintech engineer obsessed with cross-border payments. Building the infrastructure for the future of work.",
-      skills: ["Stellar SDK", "Golang", "Product"],
+      skills: ["viem", "Golang", "Product"],
       initials: "PK",
       accent: "indigo",
       socials: { github: "#", twitter: "#", linkedin: "#" }
@@ -115,7 +115,7 @@ export default function TeamPage() {
     {
       name: "Alice Roberts",
       role: "Tech Lead",
-      bio: "Passionate about building scalable distributed systems and high-throughput financial applications on Stellar.",
+      bio: "Passionate about building scalable distributed systems and high-throughput financial applications on Robinhood Chain.",
       skills: ["Rust", "Solidity", "Node.js"],
       initials: "AR",
       accent: "violet",
@@ -133,8 +133,8 @@ export default function TeamPage() {
     {
       name: "Sofia Yang",
       role: "Blockchain Dev",
-      bio: "Specialist in Stellar Soroban and on-chain asset bridging. Ensuring secure and instant settlement for global teams.",
-      skills: ["Soroban", "C++", "Smart Contracts"],
+      bio: "Specialist in Robinhood Chain and on-chain asset bridging. Ensuring secure and instant settlement for global teams.",
+      skills: ["Solidity", "C++", "Smart Contracts"],
       initials: "SY",
       accent: "cyan",
       socials: { github: "#", linkedin: "#" }

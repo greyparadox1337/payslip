@@ -1,29 +1,48 @@
-# Screenshot Instructions — PaySlip
+# Screenshots — PaySlip
 
-## Quick Start
+Every image in this directory is a real capture of the running app. No mockups,
+no generated art. If an image here did not come out of the app, it does not belong.
+
+## Captured
+
+### Desktop (1440x900, 2x DPI)
+- `desktop/01-landing.png` — landing page, full scroll
+- `desktop/02-pricing.png` — pricing
+- `desktop/03-login.png` — sign in
+- `desktop/04-signup.png` — sign up
+- `desktop/05-about.png` — about
+- `desktop/06-blog.png` — blog index
+- `desktop/07-careers.png` — careers
+- `desktop/08-components.png` — `/screenshots` component harness
+- `desktop/09-transaction-success.png` — `TransactionSuccessCard`, element clip
+
+### Mobile (390x844, 2x DPI)
+- `mobile/01-landing-mobile.png`
+- `mobile/02-pricing-mobile.png`
+- `mobile/03-login-mobile.png`
+
+## Still needed
+
+These routes require an authenticated session (and a connected wallet), so they
+have to be captured by hand while logged in:
+
+- [ ] Employer dashboard — `/employer/dashboard`
+- [ ] Payroll run + bulk disburse — `/employer/payroll`
+- [ ] Employee list — `/employer/employees`
+- [ ] Employee portal — `/employee/portal`
+
+## How to recapture
+
 ```bash
-# Generate placeholder SVGs immediately:
-node screenshots/generate-placeholders.js
-
-# Then replace with real screenshots:
-# 1. npm run dev
-# 2. Visit http://localhost:3000/screenshots
-# 3. Follow the guide on that page
+npm run dev
 ```
 
-## Screenshot Checklist
-- [ ] 01-landing.png — Landing page full viewport
-- [ ] 02-wallet-connected.png — Wallet connected + balance shown
-- [ ] 03-dashboard.png — Main dashboard
-- [ ] 04-transaction-success.png — TransactionSuccessCard
-- [ ] 05-mobile-view.png — 375px mobile layout
-- [ ] 06-ci-pipeline.png — GitHub Actions green run
-- [ ] mobile/01-landing-mobile.png
-- [ ] mobile/02-dashboard-mobile.png
-- [ ] mobile/03-action-mobile.png
+Then either use the in-app guide at http://localhost:3000/screenshots, or capture
+via Chrome DevTools (Cmd+Shift+P → "Capture full size screenshot") at a 1440x900
+viewport with device scale factor 2.
 
-## Tools
-- macOS: Cmd+Shift+4 (area screenshot)
-- Windows: Win+Shift+S
-- Chrome: DevTools → three dots → Capture screenshot
-- Firefox: DevTools → Camera icon
+The first run shows an onboarding overlay. Dismiss it once, or run
+`localStorage.setItem("payslip-onboarded","true")` in the console before capturing.
+
+Sections fade in via `IntersectionObserver` (`src/hooks/useScrollAnimation.ts`), so
+scroll the whole page before a full-page capture or the lower sections come out blank.

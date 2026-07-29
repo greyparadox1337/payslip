@@ -55,7 +55,7 @@ export default function QRCodeDisplay({ address, label = "Wallet Address" }: QRC
           
           <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground font-bold uppercase tracking-widest pt-2">
              <ShieldCheck className="h-3 w-3 text-indigo-500" />
-             Verified On Stellar
+             Verified On Robinhood Chain
           </div>
         </div>
       </div>

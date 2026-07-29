@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { requestAccess } from "@stellar/freighter-api";
+import { connectInjectedWallet, getTransactionHistory, NATIVE_SYMBOL } from "@/lib/chain";
 import { Loader2, Link as LinkIcon, Download, Copy, Settings, CheckCircle2, Lock, ShieldAlert, Check } from "lucide-react";
 import { useToast } from "@/contexts/ToastContext";
 import { Input } from "@/components/ui/input";
@@ -80,7 +80,7 @@ export default function EmployeeProfile() {
   const handleRelinkWallet = async () => {
     setIsLinking(true);
     try {
-      const { address } = await requestAccess();
+      const { address } = await connectInjectedWallet();
       if (!address) throw new Error("Wallet not accessible");
       
       const res = await fetch("/api/user/link-wallet", {
@@ -92,13 +92,13 @@ export default function EmployeeProfile() {
       const data = await res.json();
       if (res.ok) {
          setProfile({ ...profile, linkedWallet: data.linkedWallet });
-         addToast("Freighter wallet successfully updated!", "success");
+         addToast("MetaMask wallet successfully updated!", "success");
          update();
       } else {
          addToast(data.error || "Failed linking wallet", "error");
       }
     } catch(err) {
-      addToast("Freighter mapping error", "error");
+      addToast("MetaMask mapping error", "error");
     } finally {
       setIsLinking(false);
     }
@@ -143,11 +143,8 @@ export default function EmployeeProfile() {
     
     setIsDownloading(true);
     try {
-      // 1. Fetch Horizon testnet securely matching bounded arrays explicitly
-      const res = await fetch(`https://horizon-testnet.stellar.org/accounts/${profile.linkedWallet}/payments`);
-      const payload = await res.json();
-      
-      const records = payload?._embedded?.records || [];
+      // 1. Read incoming payments for this wallet off Robinhood Chain
+      const records = await getTransactionHistory(profile.linkedWallet);
       if (records.length === 0) {
         addToast("No transactions found on network history", "info");
         setIsDownloading(false);
@@ -156,13 +153,9 @@ export default function EmployeeProfile() {
 
       // 2. Format CSV mapped outputs perfectly
       let csv = "Date,Transaction Hash,Type,Asset,Amount\n";
-      records.forEach((tx: any) => {
-         const date = new Date(tx.created_at).toLocaleString();
-         const type = tx.type;
-         const hash = tx.transaction_hash;
-         const asset = tx.asset_type === "native" ? "XLM" : tx.asset_code;
-         const amount = tx.amount || "0";
-         csv += `"${date}",${hash},${type},${asset},${amount}\n`;
+      records.forEach((tx) => {
+         const date = new Date(tx.createdAt).toLocaleString();
+         csv += `"${date}",${tx.transactionHash},payment,${NATIVE_SYMBOL},${tx.amount}\n`;
       });
 
       // 3. Blob Anchor logic structurally executing standard downloads
@@ -177,7 +170,7 @@ export default function EmployeeProfile() {
 
       addToast("Payslips exported successfully", "success");
     } catch(err: any) {
-      addToast("Failed querying Horizon network", "error");
+      addToast("Failed querying Robinhood Chain", "error");
     } finally {
       setIsDownloading(false);
     }
@@ -239,7 +232,7 @@ export default function EmployeeProfile() {
             
             <div className="space-y-4">
               <div className="bg-background rounded-lg border border-border/30 p-4">
-                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-widest mb-2">Stellar Target</p>
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-widest mb-2">Robinhood Chain Target</p>
                 <div className="flex items-center justify-between">
                   {profile?.linkedWallet ? (
                     <span className="font-mono text-[14px] font-medium text-cyan-400 tracking-tight">

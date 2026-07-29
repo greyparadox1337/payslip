@@ -38,11 +38,8 @@ jobs:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
           NEXTAUTH_URL: https://placeholder.vercel.app
-          NEXT_PUBLIC_STELLAR_NETWORK: testnet
-          NEXT_PUBLIC_STELLAR_HORIZON: https://horizon-testnet.stellar.org
-          NEXT_PUBLIC_SOROBAN_RPC: https://soroban-testnet.stellar.org
-          NEXT_PUBLIC_CONTRACT_ID: PLACEHOLDER_CONTRACT_ID
-          NEXT_PUBLIC_DAO_ID: PLACEHOLDER_DAO_ID
+          NEXT_PUBLIC_CHAIN_ENV: testnet
+          NEXT_PUBLIC_ROBINHOOD_RPC: https://rpc.testnet.chain.robinhood.com
 
       - name: Build status
         run: echo "✅ Build completed successfully"
@@ -70,13 +67,13 @@ jobs:
       - name: Check for mainnet references
         run: |
           echo "Checking for mainnet references..."
-          if grep -r "horizon.stellar.org" --include="*.ts" --include="*.tsx" \
-            --exclude-dir=".next" --exclude-dir="node_modules" . | \
-            grep -v "horizon-testnet"; then
-            echo "❌ Mainnet Horizon URL found — must use testnet"
+          if grep -rn "mainnet.chain.robinhood.com" --include="*.ts" --include="*.tsx" \
+            --exclude-dir=".next" --exclude-dir="node_modules" \
+            --exclude="chains.ts" . ; then
+            echo "❌ Robinhood Chain mainnet RPC used outside src/lib/chains.ts — must use testnet"
             exit 1
           else
-            echo "✅ All Stellar references use testnet"
+            echo "✅ All Robinhood Chain references use testnet"
           fi
 
       - name: Verify .env.local is gitignored

@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Horizon } from '@stellar/stellar-sdk'
-
-const HORIZON_URL = process.env.NEXT_PUBLIC_STELLAR_HORIZON || 'https://horizon-testnet.stellar.org'
-const server = new Horizon.Server(HORIZON_URL)
+import { getTransactionByHash } from '@/lib/chain'
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,8 +9,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Transaction hash is required' }, { status: 400 })
     }
 
-    // Verify transaction exists on Horizon
-    const tx = await server.transactions().transaction(txHash).call()
+    // Verify transaction exists on Robinhood Chain
+    const tx = await getTransactionByHash(txHash)
 
     if (!tx) {
       return NextResponse.json({ verified: false, error: 'Transaction not found' }, { status: 404 })
@@ -23,14 +20,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       verified: true,
       txDetails: {
-        hash: tx.hash,
-        ledger: tx.ledger_attr,
-        createdAt: tx.created_at,
-        source: tx.source_account,
-        fee: (tx as any).fee_value || (tx as any).fee_charged || "0",
+        hash: tx.txHash,
+        blockNumber: tx.blockNumber,
+        createdAt: tx.createdAt,
+        source: tx.sourceAccount,
+        fee: tx.fee,
         memo: tx.memo,
-        successful: tx.successful
-      }
+        successful: tx.successful,
+      },
     })
   } catch (error: unknown) {
     console.error('Verify transaction error:', error)

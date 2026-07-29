@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { PayslipPDF } from "./PayslipPDF";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import TransactionSuccessCard from "./shared/TransactionSuccessCard";
-import { getWalletBalance } from "@/lib/stellar";
-import { isConnected, getAddress } from "@stellar/freighter-api";
+import { getWalletBalance, getConnectedAddress, estimateTransferFee } from "@/lib/chain";
 
 interface Employee {
   name: string;
@@ -37,6 +36,11 @@ export function PayrollTracker({
   const [timeTaken, setTimeTaken] = useState(0);
   const [updatedBalance, setUpdatedBalance] = useState("0.00");
   const [walletAddr, setWalletAddr] = useState("");
+  const [gasPerTransfer, setGasPerTransfer] = useState(0);
+
+  useEffect(() => {
+    estimateTransferFee().then(setGasPerTransfer);
+  }, []);
 
   // Ensure timer ticks up while we are processing
   useEffect(() => {
@@ -56,7 +60,7 @@ export function PayrollTracker({
       setPipelineStage(0);
       await new Promise((r) => setTimeout(r, 600));
 
-      // Step 1: Wait for user to sign via Freighter
+      // Step 1: Wait for user to sign via MetaMask
       if (!active) return;
       setPipelineStage(1);
 
@@ -71,7 +75,7 @@ export function PayrollTracker({
         console.error("Execution aborted:", err);
         if (!active) return;
         setErrorMsg(
-          err instanceof Error ? err.message : "Transaction explicitly rejected by Freighter or Horizon"
+          err instanceof Error ? err.message : "Transaction explicitly rejected by MetaMask or the RPC"
         );
       }
     }
@@ -128,14 +132,11 @@ export function PayrollTracker({
   useEffect(() => {
     if (networkConfirmed && confirmedCount === employees.length) {
       const fetchData = async () => {
-        if (await isConnected()) {
-          const res = await getAddress();
-          const addr = typeof res === 'object' && 'address' in res ? res.address : res;
-          if (addr) {
-            setWalletAddr(addr as string);
-            const bal = await getWalletBalance(addr as string);
-            setUpdatedBalance(bal || "0.00");
-          }
+        const addr = await getConnectedAddress();
+        if (addr) {
+          setWalletAddr(addr);
+          const bal = await getWalletBalance(addr);
+          setUpdatedBalance(bal || "0.00");
         }
       };
       fetchData();
@@ -146,21 +147,22 @@ export function PayrollTracker({
 
   // Render variables
   const totalAmount = employees.reduce((sum, e) => sum + parseFloat(e.salary), 0);
-  const networkFeeEst = 0.00001;
+  // One transaction per employee, so gas scales with headcount
+  const networkFeeEst = gasPerTransfer * employees.length;
 
   if (allCompleted) {
     return (
       <TransactionSuccessCard 
         title="Payroll Complete!"
-        subtitle={`Successfully paid ${employees.length} employees on the Stellar blockchain.`}
+        subtitle={`Successfully paid ${employees.length} employees on the Robinhood Chain.`}
         txHash={txHash || ""}
         amount={totalAmount.toFixed(2)}
         walletAddress={walletAddr}
         walletBalance={updatedBalance}
         extraDetails={[
-          { label: "Network Fee", value: `${networkFeeEst.toFixed(5)} XLM` },
+          { label: "Network Fee", value: `~${networkFeeEst.toFixed(6)} ETH` },
           { label: "Processing Time", value: `${timeTaken}s` },
-          { label: "Status", value: "Verified on Ledger" }
+          { label: "Status", value: "Verified on chain" }
         ]}
         onClose={onComplete}
       />
@@ -303,7 +305,7 @@ export function PayrollTracker({
                   <p className="font-mono font-semibold text-foreground">
                     {emp.salary}
                     <span className="text-[10px] text-muted-foreground ml-1">
-                      XLM
+                      ETH
                     </span>
                   </p>
                   <div className="flex items-center gap-1.5 mt-0.5">

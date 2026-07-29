@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/contexts/ToastContext";
 import DashboardSkeleton from "@/components/DashboardSkeleton";
+import { explorerTxUrl } from '@/lib/chains';
 
 interface HistoryRecord {
   id: string;
@@ -50,10 +51,10 @@ export default function HistoryPage() {
     setTimeout(() => {
       setHistory([
         { id: "1", date: "Apr 04, 2025", recipient: "Jane Doe", amount: "5,200", currency: "USDC", txHash: "2b9a...1a2b", status: "success" },
-        { id: "2", date: "Apr 04, 2025", recipient: "John Smith", amount: "3,500", currency: "XLM", txHash: "4c8f...9d0e", status: "success" },
+        { id: "2", date: "Apr 04, 2025", recipient: "John Smith", amount: "3,500", currency: "ETH", txHash: "4c8f...9d0e", status: "success" },
         { id: "3", date: "Mar 28, 2025", recipient: "Alice Wang", amount: "7,000", currency: "USDC", txHash: "8e2d...4f3a", status: "success" },
-        { id: "4", date: "Mar 28, 2025", recipient: "Bob Miller", amount: "4,500", currency: "XLM", txHash: "1a7b...6c9d", status: "success" },
-        { id: "5", date: "Mar 15, 2025", recipient: "Charlie Brown", amount: "2,000", currency: "XLM", txHash: "9d1e...3b5a", status: "failed" },
+        { id: "4", date: "Mar 28, 2025", recipient: "Bob Miller", amount: "4,500", currency: "ETH", txHash: "1a7b...6c9d", status: "success" },
+        { id: "5", date: "Mar 15, 2025", recipient: "Charlie Brown", amount: "2,000", currency: "ETH", txHash: "9d1e...3b5a", status: "failed" },
       ]);
       setLoading(false);
     }, 800);
@@ -166,7 +167,7 @@ export default function HistoryPage() {
                 </TableCell>
                 <TableCell className="py-5 text-right">
                    <a 
-                     href={`https://stellar.expert/explorer/testnet/tx/${h.txHash}`} 
+                     href={explorerTxUrl(h.txHash)} 
                      target="_blank"
                      rel="noopener noreferrer"
                      className="inline-flex items-center justify-center p-2 rounded-lg bg-white/5 border border-white/10 text-muted-foreground hover:text-amber-500 hover:border-amber-500/50 transition-all hover:scale-110"
@@ -186,7 +187,7 @@ export default function HistoryPage() {
          <div>
             <h4 className="text-sm font-bold text-amber-400 mb-1">On-Chain immutability</h4>
             <p className="text-xs text-amber-500/70 leading-relaxed max-w-2xl">
-               Every salary disbursement shown here is cryptographically verifiable on the Stellar Network. These records serve as an official audit trail for your organisation's financial compliance.
+               Every salary disbursement shown here is cryptographically verifiable on the Robinhood Chain Network. These records serve as an official audit trail for your organisation's financial compliance.
             </p>
          </div>
       </div>

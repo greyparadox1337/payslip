@@ -1,9 +1,9 @@
-const CACHE_KEY = "payslip_xlm_price";
-const CHART_CACHE_KEY = "payslip_xlm_chart";
+const CACHE_KEY = "payslip_eth_price";
+const CHART_CACHE_KEY = "payslip_eth_chart";
 const CACHE_DURATION_MS = 60000; // 60 seconds
-const FALLBACK_PRICE = 0.11;
+const FALLBACK_PRICE = 3000;
 
-export async function fetchXLMPrice(): Promise<number> {
+export async function fetchETHPrice(): Promise<number> {
   if (typeof window === "undefined") return FALLBACK_PRICE;
 
   const cachedStr = localStorage.getItem(CACHE_KEY);
@@ -20,12 +20,12 @@ export async function fetchXLMPrice(): Promise<number> {
 
   try {
     const res = await fetch(
-      "https://api.coingecko.com/api/v3/simple/price?ids=stellar&vs_currencies=usd"
+      "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
     );
     if (!res.ok) throw new Error("API Limit Reached");
-    
+
     const data = await res.json();
-    const price = data?.stellar?.usd || FALLBACK_PRICE;
+    const price = data?.ethereum?.usd || FALLBACK_PRICE;
 
     localStorage.setItem(
       CACHE_KEY,
@@ -35,7 +35,7 @@ export async function fetchXLMPrice(): Promise<number> {
     return price;
   } catch (error) {
     console.error("CoinGecko Fetch failed. Resorting to fallback:", error);
-    
+
     // Attempt to retain stale cache if possible
     if (cachedStr) {
       try {
@@ -43,12 +43,12 @@ export async function fetchXLMPrice(): Promise<number> {
         return cached.price;
       } catch {}
     }
-    
+
     return FALLBACK_PRICE;
   }
 }
 
-export async function fetchXLMHistory(): Promise<{ timestamp: number; price: number }[]> {
+export async function fetchETHHistory(): Promise<{ timestamp: number; price: number }[]> {
   if (typeof window === "undefined") return [];
 
   const cachedStr = localStorage.getItem(CHART_CACHE_KEY);
@@ -64,7 +64,7 @@ export async function fetchXLMHistory(): Promise<{ timestamp: number; price: num
 
   try {
     const res = await fetch(
-      "https://api.coingecko.com/api/v3/coins/stellar/market_chart?vs_currency=usd&days=7"
+      "https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=7"
     );
     if (!res.ok) throw new Error("History API Limit");
 
@@ -82,11 +82,11 @@ export async function fetchXLMHistory(): Promise<{ timestamp: number; price: num
     return history;
   } catch (error) {
     console.error("Failed to load historical charts:", error);
-    
+
     // Provide a mocked declining/ascending line so UI doesn't break if API blocks us
     const mock = Array.from({ length: 7 }).map((_, i) => ({
       timestamp: Date.now() - ((7 - i) * 86400000),
-      price: FALLBACK_PRICE + (Math.random() * 0.02 - 0.01),
+      price: FALLBACK_PRICE * (1 + (Math.random() * 0.04 - 0.02)),
     }));
     return mock;
   }

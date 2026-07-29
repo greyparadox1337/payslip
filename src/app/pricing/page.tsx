@@ -12,20 +12,20 @@ const FAQS = [
     a: "Absolutely. Our 'Hobby' tier is designed for early-stage teams and hackathon projects. You can sign up, link your wallet, and start paying your team immediately without ever entering a credit card. We only charge a small 0.1% fee on transactions in the Enterprise tier."
   },
   {
-    q: "Can I pay in USDC instead of XLM?",
-    a: "Yes. PaySlip supports any asset on the Stellar network, with native support for XLM and Circle's USDC. You can choose the asset per-employee, allowing for a hybrid stable-volatile payroll strategy."
+    q: "Can I pay in USDC instead of ETH?",
+    a: "Yes. PaySlip supports any asset on the Robinhood Chain, with native support for ETH and Circle's USDC. You can choose the asset per-employee, allowing for a hybrid stable-volatile payroll strategy."
   },
   {
     q: "What happens if a transaction fails?",
-    a: "Stellar transactions are atomic. If a ledger closes and your payment isn't included (due to insufficient funds or network congestion), the 'Payroll Tracker' will notify you immediately. You can then retry the specific failed recipient without re-sending to the entire team."
+    a: "Robinhood Chain transactions are atomic. If a ledger closes and your payment isn't included (due to insufficient funds or network congestion), the 'Payroll Tracker' will notify you immediately. You can then retry the specific failed recipient without re-sending to the entire team."
   },
   {
     q: "Do my employees need a crypto wallet?",
-    a: "Yes, every employee needs a Stellar-compatible public address (G...). We recommend the Freighter extension for the best experience, but PaySlip can send to any valid Stellar wallet address globally."
+    a: "Yes, every employee needs a EVM-compatible public address (0x…). We recommend the MetaMask extension for the best experience, but PaySlip can send to any valid EVM wallet address globally."
   },
   {
     q: "Is PaySlip audited or secure?",
-    a: "PaySlip is built using the industry-standard Stellar SDK and never stores your private keys. All transactions are signed locally via the Freighter wallet, ensuring you maintain 100% custody of your funds at all times."
+    a: "PaySlip is built using the industry-standard viem and never stores your private keys. All transactions are signed locally via the MetaMask wallet, ensuring you maintain 100% custody of your funds at all times."
   }
 ];
 
@@ -46,7 +46,7 @@ export default function PricingPage() {
             Simple, Transparent, On-Chain
           </div>
           <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-8 leading-tight tracking-tighter">
-            Pricing that scales with your <span className="gradient-text">Stellar team</span>
+            Pricing that scales with your <span className="gradient-text">Robinhood Chain team</span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Zero setup fees. Zero monthly subscriptions. Just pure, efficient payroll on the world's most performant network.
@@ -65,7 +65,7 @@ export default function PricingPage() {
               </div>
             </div>
             <ul className="space-y-4 mb-10">
-              {["Up to 5 employees", "Unlimited payroll runs", "Stellar XLM support", "Freighter integration", "PDF Payslips"].map((f) => (
+              {["Up to 5 employees", "Unlimited payroll runs", "Robinhood Chain ETH support", "MetaMask integration", "PDF Payslips"].map((f) => (
                 <li key={f} className="flex items-center gap-3 text-sm text-slate-300">
                   <Check className="h-4 w-4 text-cyan-400 shrink-0" />
                   {f}
@@ -90,7 +90,7 @@ export default function PricingPage() {
               </div>
             </div>
             <ul className="space-y-4 mb-10">
-              {["Unlimited employees", "USDC & XLM splits", "Advanced Analytics", "Custom CSV Export", "API Access (Beta)"].map((f) => (
+              {["Unlimited employees", "USDC & ETH splits", "Advanced Analytics", "Custom CSV Export", "API Access (Beta)"].map((f) => (
                 <li key={f} className="flex items-center gap-3 text-sm text-slate-300">
                   <Check className="h-4 w-4 text-indigo-400 shrink-0" />
                   {f}
@@ -160,7 +160,7 @@ export default function PricingPage() {
             <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay"></div>
             <div className="relative z-10">
               <h2 className="text-3xl md:text-5xl font-black text-white mb-6 tracking-tighter">Ready to join the financial frontier?</h2>
-              <p className="text-white/80 text-lg mb-10 max-w-xl mx-auto font-medium">Join 500+ global teams paying their world-class talent natively on Stellar.</p>
+              <p className="text-white/80 text-lg mb-10 max-w-xl mx-auto font-medium">Join 500+ global teams paying their world-class talent natively on Robinhood Chain.</p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link href="/signup" className="px-10 h-14 bg-white text-indigo-600 rounded-full font-black text-lg hover:scale-105 active:scale-95 transition-all shadow-2xl">
                   Get Started for Free

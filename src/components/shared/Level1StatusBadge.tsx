@@ -1,12 +1,12 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { 
-  isFreighterInstalled, 
-  isFreighterConnected, 
-  getFreighterNetwork,
-  getXLMBalance
-} from '@/lib/stellar'
+import {
+  isWalletInstalled,
+  isOnRobinhoodChain,
+  getNativeBalance
+} from '@/lib/chain'
+import { ACTIVE_CHAIN } from '@/lib/chains'
 import { Card } from '@/components/ui/card'
 import { Check, X, ChevronUp, Wallet, ShieldCheck, Globe, Zap } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -15,7 +15,7 @@ export default function Level1StatusBadge() {
   const [isOpen, setIsOpen] = useState(false)
   const [status, setStatus] = useState({
     installed: false,
-    testnet: false,
+    onChain: false,
     balanceLoaded: false,
     ready: false
   })
@@ -23,18 +23,15 @@ export default function Level1StatusBadge() {
   useEffect(() => {
     const checkAll = async () => {
       try {
-        const installed = await isFreighterInstalled()
-        const network = await getFreighterNetwork()
-        const address = localStorage.getItem('stellar_address')
-        const balance = address ? await getXLMBalance(address) : 0
-
-        const isTestnet = network === 'TESTNET'
-        const isBalanceLoaded = address ? true : false
-        const isReady = installed && isTestnet && isBalanceLoaded
+        const installed = await isWalletInstalled()
+        const onChain = await isOnRobinhoodChain()
+        const address = localStorage.getItem('wallet_address')
+        const isBalanceLoaded = address ? (await getNativeBalance(address)) >= 0 : false
+        const isReady = installed && onChain && isBalanceLoaded
 
         setStatus({
           installed,
-          testnet: isTestnet,
+          onChain,
           balanceLoaded: isBalanceLoaded,
           ready: isReady
         })
@@ -85,8 +82,8 @@ export default function Level1StatusBadge() {
             </div>
 
             <div className="space-y-3">
-              <StatusItem label="Freighter Installed" active={status.installed} />
-              <StatusItem label="Stellar Testnet" active={status.testnet} />
+              <StatusItem label="Wallet Installed" active={status.installed} />
+              <StatusItem label={ACTIVE_CHAIN.name} active={status.onChain} />
               <StatusItem label="Balance Loaded" active={status.balanceLoaded} />
               <StatusItem label="Ready to Transact" active={status.ready} />
             </div>

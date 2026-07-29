@@ -34,7 +34,7 @@ const OrganisationSchema = new Schema<IOrganisation>({
   ],
   createdAt: { type: Date, default: Date.now },
   settings: {
-    currency: { type: String, default: "XLM" },
+    currency: { type: String, default: "ETH" },
     paySchedule: {
       type: String,
       enum: ["weekly", "biweekly", "monthly"],

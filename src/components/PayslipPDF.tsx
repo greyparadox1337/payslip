@@ -1,5 +1,6 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Image, Font } from '@react-pdf/renderer';
+import { explorerTxUrl } from '@/lib/chains';
 
 // Register standard fonts for better look if possible, but Helvetica/Courier are safe defaults.
 // For a premium feel, we stick to clean weights.
@@ -227,14 +228,19 @@ interface PayslipData {
   employeeName: string;
   amount: number;
   date: string;
+  /** Gas the employer paid for this transfer, in ETH. */
+  networkFee?: number;
+  /** ETH/USD rate at the time of the transaction. */
+  usdRate?: number;
 }
 
-export const PayslipPDF = ({ txHash, employeeName, amount, date }: PayslipData) => {
+export const PayslipPDF = ({ txHash, employeeName, amount, date, networkFee = 0, usdRate = 0 }: PayslipData) => {
   const baseSalary = amount;
-  const networkFee = 0.00001;
-  const netPayment = baseSalary - networkFee;
+  // Gas comes out of the employer's wallet on top of the transfer, so the
+  // employee receives the full salary amount.
+  const netPayment = baseSalary;
   const formattedDate = new Date(date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-  const explorerUrl = `https://stellar.expert/explorer/testnet/tx/${txHash}`;
+  const explorerUrl = explorerTxUrl(txHash);
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(explorerUrl)}&size=150x150&color=06b6d4&bgcolor=ffffff`;
 
   return (
@@ -266,7 +272,7 @@ export const PayslipPDF = ({ txHash, employeeName, amount, date }: PayslipData) 
             <View style={styles.gridCol}>
               <Text style={styles.gridTitle}>Issued Date</Text>
               <Text style={styles.gridValue}>{date}</Text>
-              <Text style={styles.gridSubValue}>Network: Stellar Testnet</Text>
+              <Text style={styles.gridSubValue}>Network: Robinhood Chain Testnet</Text>
             </View>
           </View>
 
@@ -274,7 +280,7 @@ export const PayslipPDF = ({ txHash, employeeName, amount, date }: PayslipData) 
           <View style={styles.tableContainer}>
             <View style={styles.tableHeader}>
               <View style={styles.colDesc}><Text style={styles.headerText}>DESCRIPTION</Text></View>
-              <View style={styles.colAmount}><Text style={styles.headerText}>AMOUNT (XLM)</Text></View>
+              <View style={styles.colAmount}><Text style={styles.headerText}>AMOUNT (ETH)</Text></View>
             </View>
             
             <View style={styles.tableRow}>
@@ -288,23 +294,23 @@ export const PayslipPDF = ({ txHash, employeeName, amount, date }: PayslipData) 
             <View style={styles.tableRow}>
               <View style={styles.colDesc}>
                 <Text style={styles.rowText}>Network Fees (Sponsored)</Text>
-                <Text style={styles.rowTextDim}>Employer covered Stellar base reserve fee</Text>
+                <Text style={styles.rowTextDim}>Gas paid by the employer on Robinhood Chain — not deducted from this payment</Text>
               </View>
-              <View style={styles.colAmount}><Text style={styles.rowText}>-{networkFee.toFixed(5)}</Text></View>
+              <View style={styles.colAmount}><Text style={styles.rowText}>{networkFee.toFixed(6)}</Text></View>
             </View>
 
             <View style={{ ...styles.tableRow, borderBottomWidth: 0 }}>
               <View style={styles.colDesc}>
                 <Text style={styles.rowTextDim}>Estimated USD Value (at time of tx)</Text>
               </View>
-              <View style={styles.colAmount}><Text style={styles.rowTextDim}>~$ {(baseSalary * 0.11).toFixed(2)} USD</Text></View>
+              <View style={styles.colAmount}><Text style={styles.rowTextDim}>~$ {(baseSalary * usdRate).toFixed(2)} USD</Text></View>
             </View>
           </View>
 
           {/* Summary */}
           <View style={styles.summaryBox}>
             <Text style={styles.summaryLabel}>NET DISBURSEMENT</Text>
-            <Text style={styles.summaryValue}>{netPayment.toFixed(5)} XLM</Text>
+            <Text style={styles.summaryValue}>{netPayment.toFixed(5)} ETH</Text>
           </View>
 
           {/* Blockchain Verification Section */}
@@ -319,7 +325,7 @@ export const PayslipPDF = ({ txHash, employeeName, amount, date }: PayslipData) 
               <Text style={styles.hashLabel}>BLOCKCHAIN TRANSACTION HASH</Text>
               <Text style={styles.hashValue}>{txHash || "PENDING_CONFIRMATION_ON_LEDGER"}</Text>
               <Text style={styles.verificationFooterText}>
-                Scan QR code to view this transaction on the public Stellar ledger.
+                Scan QR code to view this transaction on the public Robinhood Chain ledger.
               </Text>
             </View>
           </View>
@@ -327,7 +333,7 @@ export const PayslipPDF = ({ txHash, employeeName, amount, date }: PayslipData) 
           {/* Footer */}
           <View style={styles.footer}>
             <Text style={styles.footerText}>
-              This is a digital receipt of a blockchain transaction. PaySlip is a non-custodial payroll layer on the Stellar Network.
+              This is a digital receipt of a blockchain transaction. PaySlip is a non-custodial payroll layer on the Robinhood Chain Network.
               Values are cryptographically verifiable and immutable once recorded on the ledger.
             </Text>
           </View>
