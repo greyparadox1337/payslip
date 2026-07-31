@@ -376,6 +376,12 @@ export default function SendPanel({ defaultMemo = '', onSuccess, compact = false
               placeholder="Ref: Payroll APR-2026"
               className="text-xs py-5 border-2 focus:border-primary/50 transition-all font-medium"
             />
+            {memo && (
+              <p className="text-[9px] text-amber-500/90 leading-relaxed">
+                A memo is attached as transaction calldata. Some wallets (Phantom among
+                them) refuse to sign transfers that carry one — clear this field if signing fails.
+              </p>
+            )}
           </div>
         </div>
 

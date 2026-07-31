@@ -58,6 +58,27 @@ describe('Payslip Robinhood Chain Helpers', () => {
     })
   })
 
+  describe('parseChainError wallet-signing failures', () => {
+    // Wallets with thinner EVM support fail on transfers carrying calldata and
+    // report only this. The message has to name the memo, or there is no way to
+    // guess what to change.
+    it('points at the memo when the wallet cannot sign', () => {
+      const message = parseChainError(
+        new Error('There was an error attempting to sign the transaction.')
+      )
+      expect(message).toMatch(/memo/i)
+      expect(message).toMatch(/gas/i)
+    })
+
+    it('reads the reason out of a nested wallet error', () => {
+      const message = parseChainError({
+        message: 'RPC Error',
+        details: 'insufficient funds for gas * price + value',
+      })
+      expect(message).toContain('Insufficient ETH balance')
+    })
+  })
+
   describe('chain config', () => {
     it('should target Robinhood Chain testnet by default', () => {
       expect(ACTIVE_CHAIN.id).toBe(46630)

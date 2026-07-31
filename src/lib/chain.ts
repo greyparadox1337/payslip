@@ -123,19 +123,47 @@ export async function switchToRobinhoodChain(): Promise<void> {
     const code = (error as { code?: number })?.code
     if (code !== 4902) throw error
 
-    await provider.request({
-      method: 'wallet_addEthereumChain',
-      params: [
-        {
-          chainId: chainIdHex,
-          chainName: ACTIVE_CHAIN.name,
-          nativeCurrency: ACTIVE_CHAIN.nativeCurrency,
-          rpcUrls: [...ACTIVE_CHAIN.rpcUrls.default.http],
-          blockExplorerUrls: [ACTIVE_CHAIN.blockExplorers.default.url],
-        },
-      ],
-    } as Parameters<EIP1193Provider['request']>[0])
+    try {
+      await provider.request({
+        method: 'wallet_addEthereumChain',
+        params: [
+          {
+            chainId: chainIdHex,
+            chainName: ACTIVE_CHAIN.name,
+            nativeCurrency: ACTIVE_CHAIN.nativeCurrency,
+            rpcUrls: [...ACTIVE_CHAIN.rpcUrls.default.http],
+            blockExplorerUrls: [ACTIVE_CHAIN.blockExplorers.default.url],
+          },
+        ],
+      } as Parameters<EIP1193Provider['request']>[0])
+    } catch (addError: unknown) {
+      // Not every wallet lets a site add a network. Phantom, for one, ships a
+      // fixed network list and has no custom-RPC flow, so this is a dead end
+      // rather than something the user can approve — say so instead of
+      // bubbling up "method not supported".
+      const addCode = (addError as { code?: number })?.code
+      if (addCode === 4200 || addCode === -32601 || addCode === -32602) {
+        throw new Error(
+          `${getWalletName()} will not let a website add a network. ` +
+            `Add ${ACTIVE_CHAIN.name} manually in your wallet (chain ID ${ACTIVE_CHAIN.id}, ` +
+            `RPC ${ACTIVE_CHAIN.rpcUrls.default.http[0]}), or use MetaMask or Rabby.`
+        )
+      }
+      throw addError
+    }
   }
+}
+
+/** Best-effort wallet name, for error messages that need to be specific. */
+export function getWalletName(): string {
+  const provider = getProvider() as
+    | (EIP1193Provider & { isPhantom?: boolean; isMetaMask?: boolean; isRabby?: boolean })
+    | null
+  if (!provider) return 'Your wallet'
+  if (provider.isPhantom) return 'Phantom'
+  if (provider.isRabby) return 'Rabby'
+  if (provider.isMetaMask) return 'MetaMask'
+  return 'Your wallet'
 }
 
 function getWalletClient(account: Address) {
@@ -260,6 +288,13 @@ export type SendResult =
  * The optional memo rides along as transaction calldata, which is the closest
  * EVM analogue to a Stellar memo: it is permanently recorded with the transfer
  * and readable from the explorer. It does add gas proportional to its length.
+ *
+ * WALLET COMPATIBILITY: a value transfer carrying calldata is valid — the chain
+ * prices and accepts it — but wallets classify it as a contract interaction and
+ * run extra simulation on it. Wallets with newer or thinner EVM support (Phantom
+ * among them) can fail to sign these while signing plain transfers fine, and the
+ * failure surfaces as a generic "error attempting to sign". Leave the memo empty
+ * for maximum compatibility; callers must treat it as opt-in, not a default.
  */
 export async function sendNative(params: {
   sourceAddress: string
@@ -495,7 +530,10 @@ export type BulkDisburseResult = {
  */
 export async function bulkDisburse(
   entries: { destination: string; amount: string; employeeName: string }[],
-  currency: string = NATIVE_SYMBOL
+  currency: string = NATIVE_SYMBOL,
+  // Off by default: a memo rides as calldata, and not every wallet can sign a
+  // value transfer that carries data. See sendNative.
+  options: { includeMemo?: boolean } = {}
 ): Promise<BulkDisburseResult[]> {
   const results: BulkDisburseResult[] = []
 
@@ -517,7 +555,9 @@ export async function bulkDisburse(
       sourceAddress,
       destinationAddress: entry.destination,
       amountEth: entry.amount,
-      memo: `Payroll ${currency} — ${entry.employeeName}`,
+      ...(options.includeMemo
+        ? { memo: `Payroll ${currency} - ${entry.employeeName}` }
+        : {}),
     })
 
     results.push(
@@ -627,13 +667,17 @@ export function parseChainError(error: unknown): string {
     [/chain(-| )?id|chain mismatch|does not match/i, `Wrong network — switch your wallet to ${ACTIVE_CHAIN.name}`],
     [/execution reverted/i, 'Transaction reverted on chain'],
     [/no wallet installed/i, 'No wallet detected. Install MetaMask to continue.'],
-    // The wallet's catch-all when it cannot build the transaction. On a send of
-    // the full balance the real cause is almost always no room left for gas.
-    [
-      /error attempting to sign|failed to sign|unable to sign/i,
-      `Your wallet could not sign this. Leave some ${NATIVE_SYMBOL} unspent to cover gas, then retry.`,
-    ],
   ]
+
+  // The wallet's catch-all when it cannot build the transaction. Two causes
+  // dominate: nothing left over for gas, or a memo the wallet won't sign.
+  if (/error attempting to sign|failed to sign|unable to sign/i.test(raw)) {
+    return (
+      `${getWalletName()} could not sign this transaction. ` +
+      `Clear the memo field (some wallets refuse transfers carrying one) and leave ` +
+      `some ${NATIVE_SYMBOL} unspent for gas, then retry.`
+    )
+  }
 
   for (const [pattern, message] of patterns) {
     if (pattern.test(raw)) return message
