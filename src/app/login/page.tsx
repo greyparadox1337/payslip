@@ -11,6 +11,27 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 
+/**
+ * Only follow a returnUrl that is a same-origin path this role can actually
+ * reach. Two reasons: an absolute URL here is an open redirect, and sending a
+ * signed-in user back to an area their role is barred from ping-pongs between
+ * middleware and this page forever.
+ */
+function safeReturnUrl(url: string, role?: string): string | null {
+  // Must be a relative path — "//evil.com" and "https://evil.com" are not.
+  if (!url.startsWith("/") || url.startsWith("//")) return null;
+
+  const path = url.split("?")[0];
+  if (path.startsWith("/employer") && role !== "employer") return null;
+  if (path.startsWith("/employee") && role !== "employee") return null;
+
+  // These bare segments have no page; the real entry points are one level down.
+  if (path === "/employer") return "/employer/dashboard";
+  if (path === "/employee") return "/employee/portal";
+
+  return url;
+}
+
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -30,16 +51,16 @@ function LoginContent() {
   const [shake, setShake] = useState(false);
 
   useEffect(() => {
-    if (status === "authenticated") {
-      const returnUrl = searchParams.get("returnUrl");
-      if (returnUrl) {
-        router.push(decodeURIComponent(returnUrl));
-      } else if (session?.user?.role === "employer") {
-        router.push("/employer/dashboard");
-      } else if (session?.user?.role === "employee") {
-        router.push("/employee/portal");
-      }
-    }
+    if (status !== "authenticated") return;
+
+    const role = session?.user?.role;
+    const home =
+      role === "employer" ? "/employer/dashboard" : role === "employee" ? "/employee/portal" : "/";
+
+    const returnUrl = searchParams.get("returnUrl");
+    const target = returnUrl ? safeReturnUrl(decodeURIComponent(returnUrl), role) : null;
+
+    router.push(target ?? home);
   }, [status, router, searchParams, session]);
 
   // Countdown timer for locked accounts

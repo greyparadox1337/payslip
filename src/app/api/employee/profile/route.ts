@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isAddress, getAddress } from "viem";
 import { getServerSession } from "next-auth";
 import connectDB from "@/lib/db";
 import { User } from "@/lib/models/User";
@@ -38,7 +39,13 @@ export async function PATCH(req: Request) {
     // Patch valid fields
     if (body.name) user.name = body.name;
     if (body.avatarColor) user.avatarColor = body.avatarColor;
-    if (body.linkedWallet) user.linkedWallet = body.linkedWallet;
+    if (body.linkedWallet) {
+      if (!isAddress(body.linkedWallet)) {
+        return NextResponse.json({ error: "Invalid EVM wallet address" }, { status: 400 });
+      }
+      // Checksummed, so every stored address has one canonical form
+      user.linkedWallet = getAddress(body.linkedWallet);
+    }
 
     await user.save();
     return NextResponse.json({ success: true, user });

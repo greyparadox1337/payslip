@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect } from 'react'
 import {
-  validateAddress,
   sendNative,
   getNativeBalance,
   estimateTransferFee,
   NATIVE_SYMBOL,
   SendResult
 } from '@/lib/chain'
+import { deriveSendValidation, formatGas } from '@/lib/sendValidation'
 import { ACTIVE_CHAIN, explorerTxUrl } from '@/lib/chains'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -40,8 +40,8 @@ export default function SendPanel({ defaultMemo = '', onSuccess, compact = false
   const [amount, setAmount] = useState('')
   const [memo, setMemo] = useState(defaultMemo)
   const [balance, setBalance] = useState<number>(0)
+  const [balanceLoaded, setBalanceLoaded] = useState(false)
   const [address, setAddress] = useState('')
-  const [errors, setErrors] = useState<{ destination?: string; amount?: string }>({})
   const [txResult, setTxResult] = useState<SendResult | null>(null)
   const [copied, setCopied] = useState(false)
   const [gasFee, setGasFee] = useState(0)
@@ -50,7 +50,10 @@ export default function SendPanel({ defaultMemo = '', onSuccess, compact = false
     const savedAddress = localStorage.getItem('wallet_address')
     if (savedAddress) {
       setAddress(savedAddress)
-      getNativeBalance(savedAddress).then(setBalance)
+      getNativeBalance(savedAddress).then((b) => {
+        setBalance(b)
+        setBalanceLoaded(true)
+      })
     }
   }, [])
 
@@ -59,28 +62,15 @@ export default function SendPanel({ defaultMemo = '', onSuccess, compact = false
     estimateTransferFee(memo).then(setGasFee)
   }, [memo])
 
-  // Leave headroom for gas so a MAX send does not fail on the fee
-  const spendable = Math.max(0, balance - gasFee * 2)
-
-  const validate = () => {
-    const newErrors: { destination?: string; amount?: string } = {}
-
-    const { valid, error } = validateAddress(destination)
-    if (!valid) newErrors.destination = error ?? 'Invalid address'
-
-    const numAmount = parseFloat(amount)
-    if (isNaN(numAmount) || numAmount <= 0) {
-      newErrors.amount = 'Enter a valid amount'
-    } else if (numAmount > spendable) {
-      newErrors.amount = `Insufficient balance (leave ~${(gasFee * 2).toFixed(6)} ${NATIVE_SYMBOL} for gas)`
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+  // Derived on every render, never stored. See deriveSendValidation for why.
+  const { destinationError, amountError, maxAmount, canSend } = deriveSendValidation(
+    { destination, amount, balance, balanceLoaded, gasFee },
+    NATIVE_SYMBOL
+  )
+  const errors = { destination: destinationError, amount: amountError }
 
   const handleSend = async () => {
-    if (!validate()) return
+    if (!canSend) return
 
     setStep('BUILDING')
     setTimeout(async () => {
@@ -339,7 +329,6 @@ export default function SendPanel({ defaultMemo = '', onSuccess, compact = false
                 id="destination"
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
-                onBlur={() => validate()}
                 placeholder="0x… (recipient address)"
                 className={`font-mono text-xs pr-10 py-5 border-2 transition-all duration-200 ${errors.destination ? 'border-rose-500/50 bg-rose-500/5' : destination && !errors.destination ? 'border-cyan-500/50 bg-cyan-500/5' : 'focus:border-primary/50'}`}
               />
@@ -354,7 +343,7 @@ export default function SendPanel({ defaultMemo = '', onSuccess, compact = false
             <div className="flex justify-between items-center">
               <Label htmlFor="amount" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Amount to Send</Label>
               <p className="text-[10px] font-medium text-muted-foreground">
-                Spendable: <span className="text-primary font-bold">{spendable.toFixed(4)} {NATIVE_SYMBOL}</span>
+                Spendable: <span className="text-primary font-bold">{maxAmount.toFixed(6)} {NATIVE_SYMBOL}</span>
               </p>
             </div>
             <div className="relative">
@@ -367,7 +356,7 @@ export default function SendPanel({ defaultMemo = '', onSuccess, compact = false
                 className={`font-mono py-5 border-2 transition-all duration-200 ${errors.amount ? 'border-rose-500/50 bg-rose-500/5' : 'focus:border-primary/50'}`}
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                <Button variant="ghost" size="sm" className="h-7 text-[10px] px-2 font-black border border-primary/20 text-primary hover:bg-primary/10" onClick={() => setAmount(spendable.toFixed(6))}>MAX</Button>
+                <Button variant="ghost" size="sm" className="h-7 text-[10px] px-2 font-black border border-primary/20 text-primary hover:bg-primary/10" onClick={() => setAmount(maxAmount.toFixed(6))}>MAX</Button>
                 <span className="text-xs font-black text-muted-foreground">{NATIVE_SYMBOL}</span>
               </div>
             </div>
@@ -394,14 +383,14 @@ export default function SendPanel({ defaultMemo = '', onSuccess, compact = false
            <div className="space-y-1 mb-4 p-3 bg-primary/5 rounded-lg border border-primary/10">
               <div className="flex justify-between items-center opacity-60">
                  <span className="text-[10px] font-bold uppercase tracking-widest">Network Fee</span>
-                 <span className="text-[10px] font-mono font-bold">~{gasFee.toFixed(6)} {NATIVE_SYMBOL}</span>
+                 <span className="text-[10px] font-mono font-bold">~{formatGas(gasFee)} {NATIVE_SYMBOL}</span>
               </div>
               <p className="text-[9px] text-muted-foreground italic">Estimated gas at the current price — the wallet quotes the final cost.</p>
            </div>
 
            <Button 
             className="w-full py-7 text-lg bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25 group transition-all"
-            disabled={!destination || !amount || !!errors.destination || !!errors.amount}
+            disabled={!canSend}
             onClick={handleSend}
           >
             <Send className="mr-2 h-5 w-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />

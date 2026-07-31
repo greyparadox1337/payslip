@@ -44,7 +44,7 @@ export default function JoinClientFlow({ token, name, email }: { token: string; 
       });
       if (signInRes.ok) {
         addToast("Account ready! Redirecting…", "success");
-        router.push("/employee");
+        router.push("/employee/portal");
       } else {
         addToast("Login after join failed", "error");
       }

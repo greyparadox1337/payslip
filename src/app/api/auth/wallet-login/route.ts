@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isAddress } from "viem";
 import connectDB from "@/lib/db";
 import { User } from "@/lib/models/User";
 import jwt from "jsonwebtoken";
@@ -6,12 +7,18 @@ import jwt from "jsonwebtoken";
 export async function POST(req: Request) {
   try {
     const { walletAddress } = await req.json();
-    if (!walletAddress) {
-      return NextResponse.json({ error: "Missing wallet address" }, { status: 400 });
+    if (!walletAddress || typeof walletAddress !== "string" || !isAddress(walletAddress)) {
+      return NextResponse.json({ error: "Invalid EVM wallet address" }, { status: 400 });
     }
 
     await connectDB();
-    const user = await User.findOne({ linkedWallet: walletAddress, role: "employee" });
+    // Match case-insensitively — EVM addresses are, and rows written before
+    // checksumming was enforced can be in any casing. Safe to interpolate:
+    // isAddress already proved this is 0x plus 40 hex characters.
+    const user = await User.findOne({
+      linkedWallet: new RegExp(`^${walletAddress}$`, "i"),
+      role: "employee",
+    });
     if (!user) {
       return NextResponse.json({ error: "No employee account linked to this wallet. Please sign up first." }, { status: 404 });
     }

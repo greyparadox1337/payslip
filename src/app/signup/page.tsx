@@ -74,8 +74,8 @@ export default function SignupPage() {
       });
 
       if (signInRes?.ok) {
-        if (role === "employer") router.push("/employer");
-        if (role === "employee") router.push("/employee");
+        if (role === "employer") router.push("/employer/dashboard");
+        if (role === "employee") router.push("/employee/portal");
       } else {
         router.push("/login");
       }

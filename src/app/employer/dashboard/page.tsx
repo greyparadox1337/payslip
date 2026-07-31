@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useOrg } from "@/lib/context/OrgContext";
+import { useToast } from "@/contexts/ToastContext";
 import {
   Users,
   CalendarClock,
@@ -48,7 +49,7 @@ import {
 
 import { useCurrencyStore } from "@/store/currencyStore";
 import { fetchETHHistory } from "@/lib/price";
-import { bulkDisburse, connectWallet, getWalletBalance, estimateTransferFee } from "@/lib/chain";
+import { bulkDisburse, connectWallet, getWalletBalance, estimateTransferFee, validateAddress, parseChainError, getConnectedAddress } from "@/lib/chain";
 import { connectInjectedWallet } from "@/lib/chain";
 import { PayrollTracker } from "@/components/PayrollTracker";
 import { OrgSwitcher } from "@/components/OrgSwitcher";
@@ -235,8 +236,9 @@ function useCountUp(end: number, duration: number = 2000) {
  * ═════════════════════════════════════════════ */
 export default function EmployerDashboard() {
   const { data: session, update } = useSession();
+  const { addToast } = useToast();
   const { currency, ethUsdRate, refreshRate } = useCurrencyStore();
-  const { activeOrg, orgs, switchOrg, createOrg, loading: orgLoading, transitioning } = useOrg();
+  const { activeOrg, orgs, switchOrg, createOrg, refreshOrgs, loading: orgLoading, transitioning } = useOrg();
   const [employees, setEmployees] = useState<Employee[]>([]);
 
   // Wallet Persistence State
@@ -255,21 +257,26 @@ export default function EmployerDashboard() {
   useEffect(() => {
     async function checkWallet() {
       try {
-        const pk = await connectInjectedWallet().then(r => r.address);
-        const userWallet = (session?.user as any)?.linkedWallet;
-        const orgWallet = activeOrg?.walletAddress;
-
-        if (userWallet && pk !== userWallet) {
-          setShowMismatch(true);
-        } else {
+        // Read the already-authorised account. Calling connect here would pop
+        // the wallet open on every dashboard load, before the user asked.
+        const pk = await getConnectedAddress();
+        if (!pk) {
           setShowMismatch(false);
+          return;
         }
 
-        if (pk) {
-          const bal = await getWalletBalance(pk);
-          setBalance(bal);
-        }
-      } catch (err) {}
+        const userWallet = (session?.user as any)?.linkedWallet;
+
+        // EVM addresses are case-insensitive; a checksummed address from the
+        // wallet and a lowercased one from the database are the same account.
+        const sameWallet = userWallet && pk.toLowerCase() === userWallet.toLowerCase();
+        setShowMismatch(Boolean(userWallet) && !sameWallet);
+
+        const bal = await getWalletBalance(pk);
+        setBalance(bal);
+      } catch (err) {
+        console.error("Wallet check failed:", err);
+      }
     }
     if (session && activeOrg) {
       checkWallet();
@@ -279,10 +286,12 @@ export default function EmployerDashboard() {
   const refreshBalance = async () => {
     setBalanceLoading(true);
     try {
-      const pk = await connectInjectedWallet().then(r => r.address);
+      const pk = (await getConnectedAddress()) ?? (await connectWallet());
       const bal = await getWalletBalance(pk);
       setBalance(bal);
-    } catch (err) {}
+    } catch (err) {
+      addToast(parseChainError(err), "error");
+    }
     setTimeout(() => setBalanceLoading(false), 800);
   };
 
@@ -290,21 +299,31 @@ export default function EmployerDashboard() {
     setLinking(true);
     try {
       const address = await connectWallet();
-      if (!address || !address.startsWith("G") || address.length !== 56) {
-        throw new Error("Invalid format");
+      const { valid, error } = validateAddress(address);
+      if (!valid) {
+        throw new Error(error ?? "Invalid wallet address");
       }
-      
+
       const res = await fetch("/api/user/link-wallet", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ walletAddress: address, orgId: activeOrg?._id })
       });
-      if (res.ok) {
-        await update({ linkedWallet: address }); 
-        setShowMismatch(false);
-        refreshBalance();
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Could not link wallet");
       }
-    } catch (err) {}
+
+      await update({ linkedWallet: address });
+      // The API also writes walletAddress onto the org, but activeOrg is cached
+      // in context — without this the banner keeps rendering after a good link.
+      await refreshOrgs();
+      setShowMismatch(false);
+      refreshBalance();
+      addToast("Wallet linked", "success");
+    } catch (err: unknown) {
+      addToast(parseChainError(err), "error");
+    }
     setLinking(false);
   };
 
@@ -546,7 +565,9 @@ export default function EmployerDashboard() {
     : 'First login';
     
   const userWallet = (session?.user as any)?.linkedWallet;
-  const isMissingWallet = !userWallet || !activeOrg?.walletAddress;
+  // Wait for the org to load — otherwise the banner flashes with an empty name
+  // ("…disbursement for .") before /api/orgs has answered.
+  const isMissingWallet = !orgLoading && !!activeOrg && (!userWallet || !activeOrg.walletAddress);
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">

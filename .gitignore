@@ -50,3 +50,7 @@ next-env.d.ts
 
 # Local DB
 mongodb_data/
+
+# Temporary / extracted files
+springbreak*
+
