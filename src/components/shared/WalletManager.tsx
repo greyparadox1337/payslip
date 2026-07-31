@@ -9,7 +9,12 @@ import {
   isOnRobinhoodChain,
   switchToRobinhoodChain,
   parseChainError,
-  NATIVE_SYMBOL
+  listWallets,
+  selectWallet,
+  getSelectedWalletRdns,
+  getWalletName,
+  NATIVE_SYMBOL,
+  type WalletOption
 } from '@/lib/chain'
 import { ACTIVE_CHAIN, FAUCET_URL, explorerAddressUrl } from '@/lib/chains'
 import { Button } from '@/components/ui/button'
@@ -24,6 +29,22 @@ export default function WalletManager() {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [wallets, setWallets] = useState<WalletOption[]>([])
+  const [selectedRdns, setSelectedRdns] = useState<string | null>(null)
+
+  // Extensions announce themselves asynchronously, so poll briefly on mount
+  // rather than reading once and missing a slow loader.
+  useEffect(() => {
+    setSelectedRdns(getSelectedWalletRdns())
+    const poll = () => setWallets(listWallets())
+    poll()
+    const id = setInterval(poll, 500)
+    const stop = setTimeout(() => clearInterval(id), 3000)
+    return () => {
+      clearInterval(id)
+      clearTimeout(stop)
+    }
+  }, [])
 
   const checkStatus = useCallback(async () => {
     try {
@@ -76,7 +97,11 @@ export default function WalletManager() {
     }
   }, [error])
 
-  const handleConnect = async () => {
+  const handleConnect = async (rdns?: string) => {
+    if (rdns) {
+      selectWallet(rdns)
+      setSelectedRdns(rdns)
+    }
     setStatus('CONNECTING')
     setError(null)
     try {
@@ -95,6 +120,10 @@ export default function WalletManager() {
   const handleDisconnect = () => {
     disconnectWallet()
     localStorage.removeItem('wallet_address')
+    // Clear the wallet choice too, so disconnecting is also how you switch
+    // wallets rather than being stuck with the first one picked.
+    selectWallet(null)
+    setSelectedRdns(null)
     setAddress('')
     setBalance(0)
     setStatus('DISCONNECTED')
@@ -205,20 +234,52 @@ export default function WalletManager() {
           <CardDescription>Required to sign transactions on {ACTIVE_CHAIN.name}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Button 
-            className="w-full py-6 text-lg bg-primary hover:bg-primary/90" 
-            disabled={status === 'CONNECTING'}
-            onClick={handleConnect}
-          >
-            {status === 'CONNECTING' ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Connecting...
-              </>
-            ) : (
-              'Connect Wallet'
-            )}
-          </Button>
+          {/* With several extensions installed, window.ethereum is whichever one
+              overwrote it last. Let the user say which wallet to drive. */}
+          {wallets.length > 0 ? (
+            <div className="space-y-2">
+              {wallets.map((w) => (
+                <button
+                  key={w.rdns}
+                  disabled={status === 'CONNECTING'}
+                  onClick={() => handleConnect(w.rdns)}
+                  className={`w-full flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-all hover:bg-primary/5 disabled:opacity-60 ${
+                    selectedRdns === w.rdns ? 'border-primary/60 bg-primary/5' : 'border-border/40'
+                  }`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={w.icon} alt="" className="h-7 w-7 rounded" />
+                  <span className="flex-1 font-semibold">{w.name}</span>
+                  {status === 'CONNECTING' && selectedRdns === w.rdns ? (
+                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                  ) : (
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                      Connect
+                    </span>
+                  )}
+                </button>
+              ))}
+              <p className="text-center text-[10px] text-muted-foreground pt-1">
+                Not every wallet supports {ACTIVE_CHAIN.name}. MetaMask and Rabby let this
+                site add the network; some others require adding it by hand.
+              </p>
+            </div>
+          ) : (
+            <Button
+              className="w-full py-6 text-lg bg-primary hover:bg-primary/90"
+              disabled={status === 'CONNECTING'}
+              onClick={() => handleConnect()}
+            >
+              {status === 'CONNECTING' ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Connecting...
+                </>
+              ) : (
+                'Connect Wallet'
+              )}
+            </Button>
+          )}
           {status === 'CONNECTING' && (
             <p className="text-center text-xs text-muted-foreground animate-pulse">
               Please approve the connection in your wallet
@@ -242,7 +303,7 @@ export default function WalletManager() {
           <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
           <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Connected to {ACTIVE_CHAIN.name}</span>
         </div>
-        <span className="text-[10px] font-mono text-muted-foreground">Chain {ACTIVE_CHAIN.id}</span>
+        <span className="text-[10px] font-mono text-muted-foreground">{getWalletName()} · Chain {ACTIVE_CHAIN.id}</span>
       </div>
       
       <CardContent className="p-6 space-y-6">

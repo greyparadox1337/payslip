@@ -42,8 +42,96 @@ declare global {
   }
 }
 
+/** A wallet announced over EIP-6963. */
+export interface WalletOption {
+  /** Reverse-DNS id, e.g. "io.metamask" or "app.phantom". Stable across sessions. */
+  rdns: string
+  name: string
+  /** data: URI, safe to drop straight into an <img src>. */
+  icon: string
+}
+
+interface ProviderDetail {
+  info: { uuid: string; name: string; icon: string; rdns: string }
+  provider: EIP1193Provider
+}
+
+const SELECTED_WALLET_KEY = 'wallet_rdns'
+
+/**
+ * Wallets that announced themselves, keyed by rdns.
+ *
+ * With more than one extension installed, `window.ethereum` is whichever one won
+ * the race to overwrite it — so the site can end up driving a different wallet
+ * than the user thinks. EIP-6963 has each wallet announce itself instead, which
+ * lets the user pick.
+ */
+const announced = new Map<string, ProviderDetail>()
+
+function startDiscovery() {
+  if (typeof window === 'undefined') return
+  window.addEventListener('eip6963:announceProvider', (event: Event) => {
+    const detail = (event as CustomEvent<ProviderDetail>).detail
+    if (detail?.info?.rdns) announced.set(detail.info.rdns, detail)
+  })
+  window.dispatchEvent(new Event('eip6963:requestProvider'))
+}
+
+startDiscovery()
+
+/**
+ * Wallets available to connect. Re-requests announcements each call, since an
+ * extension may finish loading after the first pass.
+ */
+export function listWallets(): WalletOption[] {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('eip6963:requestProvider'))
+  }
+  return Array.from(announced.values()).map(({ info }) => ({
+    rdns: info.rdns,
+    name: info.name,
+    icon: info.icon,
+  }))
+}
+
+/**
+ * Remember which wallet to drive. Pass null to fall back to auto-detect.
+ *
+ * localStorage is not guaranteed usable just because `window` exists — it
+ * throws in sandboxed iframes and can be stubbed out in tests — and losing a
+ * wallet preference must never take down a send.
+ */
+export function selectWallet(rdns: string | null): void {
+  try {
+    if (rdns) localStorage.setItem(SELECTED_WALLET_KEY, rdns)
+    else localStorage.removeItem(SELECTED_WALLET_KEY)
+  } catch {
+    // Preference is not persisted; the session still works.
+  }
+}
+
+export function getSelectedWalletRdns(): string | null {
+  try {
+    return localStorage.getItem(SELECTED_WALLET_KEY)
+  } catch {
+    return null
+  }
+}
+
 function getProvider(): EIP1193Provider | null {
   if (typeof window === 'undefined') return null
+
+  const chosen = getSelectedWalletRdns()
+  if (chosen) {
+    const match = announced.get(chosen)
+    if (match) return match.provider
+    // Chosen wallet is not announcing (disabled or uninstalled) — fall through
+    // rather than leaving the app with no provider at all.
+  }
+
+  // Single announced wallet is unambiguous; prefer it over the injected global.
+  if (announced.size === 1) return Array.from(announced.values())[0].provider
+
   return window.ethereum ?? null
 }
 
@@ -156,6 +244,10 @@ export async function switchToRobinhoodChain(): Promise<void> {
 
 /** Best-effort wallet name, for error messages that need to be specific. */
 export function getWalletName(): string {
+  // The announced name is authoritative when we know which wallet was chosen.
+  const chosen = getSelectedWalletRdns()
+  if (chosen && announced.has(chosen)) return announced.get(chosen)!.info.name
+
   const provider = getProvider() as
     | (EIP1193Provider & { isPhantom?: boolean; isMetaMask?: boolean; isRabby?: boolean })
     | null
