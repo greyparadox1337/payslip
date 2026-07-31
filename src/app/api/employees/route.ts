@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isAddress, getAddress } from "viem";
 import { getServerSession } from "next-auth";
 import connectDB from "@/lib/db";
 import { Employee } from "@/lib/models/Employee";
@@ -46,6 +47,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
+    // Payroll sends here later — a malformed address must not reach the database
+    if (typeof walletAddress !== "string" || !isAddress(walletAddress)) {
+      return NextResponse.json({ error: "Invalid EVM wallet address" }, { status: 400 });
+    }
+
     const userId = (session.user as { userId?: string }).userId; if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     await connectDB();
 
@@ -56,7 +62,7 @@ export async function POST(req: Request) {
 
     const newEmp = await Employee.create({
       name,
-      walletAddress,
+      walletAddress: getAddress(walletAddress),
       salary,
       orgId,
       status: "active"

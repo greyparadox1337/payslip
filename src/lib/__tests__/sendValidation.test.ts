@@ -49,13 +49,22 @@ describe('deriveSendValidation', () => {
     expect(afterMax.canSend).toBe(true)
   })
 
-  it('accepts its own MAX suggestion when gas is unquotable', () => {
+  // gasFee of 0 means "quote failed" as often as "gas is nearly free". Offering
+  // the whole balance produces a transfer the wallet cannot sign at all.
+  it('still holds back gas when the fee cannot be quoted', () => {
     const state = form({ balance: 0.01, gasFee: 0 })
     const { maxAmount } = deriveSendValidation(state)
-    expect(maxAmount).toBe(0.01)
+    expect(maxAmount).toBeLessThan(0.01)
 
     const afterMax = deriveSendValidation({ ...state, amount: maxAmount.toFixed(6) })
     expect(afterMax.canSend).toBe(true)
+  })
+
+  it('never offers the entire balance as MAX', () => {
+    for (const gasFee of [0, 0.00000021, 0.001]) {
+      const { maxAmount } = deriveSendValidation(form({ balance: 0.01, gasFee }))
+      expect(maxAmount).toBeLessThan(0.01)
+    }
   })
 
   // The wedge: an error raised before the balance arrived used to stick forever.
@@ -71,9 +80,17 @@ describe('deriveSendValidation', () => {
     expect(broke.canSend).toBe(false)
 
     // Same amount, balance now funded — recomputing must let it through
-    const funded = deriveSendValidation(form({ balance: 0.01, amount: '0.01' }))
+    const funded = deriveSendValidation(form({ balance: 0.02, amount: '0.01' }))
     expect(funded.amountError).toBeNull()
     expect(funded.canSend).toBe(true)
+  })
+
+  // Spending the balance to the last wei leaves nothing for gas, which is what
+  // produced the wallet's opaque "error attempting to sign".
+  it('rejects sending the exact full balance', () => {
+    const v = deriveSendValidation(form({ balance: 0.01, amount: '0.01', gasFee: 0.00000021 }))
+    expect(v.amountError).toContain('Insufficient balance')
+    expect(v.canSend).toBe(false)
   })
 
   it('reserves gas headroom out of the spendable balance', () => {

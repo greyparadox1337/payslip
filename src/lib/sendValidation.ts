@@ -22,6 +22,17 @@ export interface SendValidation {
 }
 
 /**
+ * Gas headroom to hold back when the fee cannot be quoted.
+ *
+ * estimateTransferFee returns 0 both for "gas is nearly free" and for "the RPC
+ * call failed". Trusting a 0 makes MAX offer the entire balance, and a transfer
+ * with nothing left for gas cannot be signed at all — the wallet rejects it with
+ * an opaque error. At Robinhood Chain's 0.01 gwei this is ~5000x a single
+ * transfer, and still a rounding error in ETH terms.
+ */
+const FALLBACK_GAS_RESERVE = 0.000001
+
+/**
  * L2 gas rounds to 0.000000 at six decimals, which reads as "free" rather than
  * "very small". Show a floor marker instead of a row of zeros.
  */
@@ -48,8 +59,10 @@ export function deriveSendValidation(
   const { destination, amount, balance, balanceLoaded, gasFee } = state
 
   // Reserve two transfers' worth of gas so a MAX send still has room if the
-  // gas price ticks up between the quote and the signature.
-  const spendable = Math.max(0, balance - gasFee * 2)
+  // gas price ticks up between the quote and the signature. Never reserve
+  // nothing: a send that leaves zero for gas is unsignable.
+  const gasReserve = Math.max(gasFee * 2, FALLBACK_GAS_RESERVE)
+  const spendable = Math.max(0, balance - gasReserve)
   // Round DOWN: toFixed rounds up, which would put MAX a hair over spendable
   // and make the form reject its own suggestion.
   const maxAmount = Math.floor(spendable * 1e6) / 1e6
@@ -67,7 +80,7 @@ export function deriveSendValidation(
       amountError = 'Enter a valid amount'
     } else if (balanceLoaded && numAmount > spendable) {
       // Only judge against a balance we have actually fetched
-      amountError = `Insufficient balance (leave ~${formatGas(gasFee * 2)} ${nativeSymbol} for gas)`
+      amountError = `Insufficient balance (leave ~${formatGas(gasReserve)} ${nativeSymbol} for gas)`
     }
   }
 

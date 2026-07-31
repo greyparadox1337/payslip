@@ -374,6 +374,7 @@ export default function EmployerDashboard() {
   const [formEmail, setFormEmail] = useState("");
   const [formWallet, setFormWallet] = useState("");
   const [formSalary, setFormSalary] = useState("");
+  const [savingEmployee, setSavingEmployee] = useState(false);
 
   // Payroll Modal State
   const [payrollModalOpen, setPayrollModalOpen] = useState(false);
@@ -461,51 +462,96 @@ export default function EmployerDashboard() {
   }
 
   async function handleSaveEmployee() {
-    if (!formName || !formWallet || !formSalary || !activeOrg) return;
+    // This used to `return` silently on any empty field, so the button looked
+    // dead. Say what is missing instead.
+    const missing: string[] = [];
+    if (!formName.trim()) missing.push("full name");
+    if (!formWallet.trim()) missing.push("wallet address");
+    if (!formSalary) missing.push("monthly salary");
+    if (missing.length) {
+      addToast(`Please fill in the ${missing.join(", ")}.`, "error");
+      return;
+    }
+    if (!activeOrg) {
+      addToast("No active organisation — reload and try again.", "error");
+      return;
+    }
+
+    const { valid, error: addressError } = validateAddress(formWallet.trim());
+    if (!valid) {
+      addToast(addressError ?? "Invalid wallet address", "error");
+      return;
+    }
+
+    const salaryNum = Number(formSalary);
+    if (!isFinite(salaryNum) || salaryNum <= 0) {
+      addToast("Monthly salary must be greater than zero.", "error");
+      return;
+    }
+
+    setSavingEmployee(true);
+    try {
+      await saveEmployee(salaryNum);
+    } finally {
+      setSavingEmployee(false);
+    }
+  }
+
+  async function saveEmployee(salaryNum: number) {
+    if (!activeOrg) return;
+    const formWalletTrimmed = formWallet.trim();
 
     if (editingEmployee) {
       setEmployees((prev) =>
         prev.map((e) =>
           e.id === editingEmployee.id
-            ? { ...e, name: formName, walletAddress: formWallet, salary: Number(formSalary) }
+            ? { ...e, name: formName, walletAddress: formWalletTrimmed, salary: salaryNum }
             : e
         )
       );
-    } else {
-      try {
-        const isInvite = !!formEmail;
-        const endpoint = isInvite ? "/api/employees/invite" : "/api/employees";
-        const body = { 
-           name: formName, 
-           walletAddress: formWallet, 
-           salary: Number(formSalary), 
-           orgId: activeOrg._id,
-           ...(isInvite && { email: formEmail })
-        };
-
-        const res = await fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
-        });
-
-        if (res.ok) {
-           const data = await res.json();
-           setEmployees((prev) => [...prev, {
-             id: data.employee._id,
-             name: formName,
-             walletAddress: formWallet,
-             salary: Number(formSalary),
-             status: isInvite ? "pending" : "active",
-           }]);
-           // Automatically trigger dashboard layout animation blocks explicitly mapping
-           if (isInvite) alert("Invite Generated! Sequence output via Local Terminal Console mapping.");
-        }
-      } catch (err) {
-        console.error("Employee sync error", err);
-      }
+      setEmpDialogOpen(false);
+      return;
     }
-    setEmpDialogOpen(false);
+
+    try {
+      const isInvite = !!formEmail;
+      const endpoint = isInvite ? "/api/employees/invite" : "/api/employees";
+      const body = {
+        name: formName,
+        walletAddress: formWalletTrimmed,
+        salary: salaryNum,
+        orgId: activeOrg._id,
+        ...(isInvite && { email: formEmail })
+      };
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+
+      // A failed response used to fall through silently, so a 403 from the org
+      // access check looked identical to success-with-nothing-happening.
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || `Could not add employee (${res.status})`);
+      }
+
+      const data = await res.json();
+      setEmployees((prev) => [...prev, {
+        id: data.employee._id,
+        name: formName,
+        walletAddress: formWalletTrimmed,
+        salary: salaryNum,
+        status: isInvite ? "pending" : "active",
+      }]);
+
+      addToast(isInvite ? `Invite created for ${formName}` : `${formName} added`, "success");
+      setEmpDialogOpen(false);
+    } catch (err: unknown) {
+      console.error("Employee sync error", err);
+      addToast(err instanceof Error ? err.message : "Could not add employee", "error");
+    }
   }
 
   function handleDeleteEmployee(id: string) {
@@ -1090,7 +1136,10 @@ export default function EmployerDashboard() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEmpDialogOpen(false)} className="border-border/20 bg-transparent text-foreground hover:bg-background">Cancel</Button>
-            <Button onClick={handleSaveEmployee} className="bg-primary hover:bg-indigo-400 text-white shadow-lg shadow-primary/20">{editingEmployee ? "Save Changes" : "Add Employee"}</Button>
+            <Button onClick={handleSaveEmployee} disabled={savingEmployee} className="bg-primary hover:bg-indigo-400 text-white shadow-lg shadow-primary/20">
+              {savingEmployee && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
+              {editingEmployee ? "Save Changes" : "Add Employee"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -6,6 +6,7 @@ import { User } from "@/lib/models/User";
 import { checkOrgAccess } from "@/lib/checkOrgAccess";
 import { authOptions } from "@/lib/auth";
 import crypto from "crypto";
+import { isAddress, getAddress } from "viem";
 
 export async function POST(req: Request) {
   try {
@@ -19,6 +20,12 @@ export async function POST(req: Request) {
     if (!name || !walletAddress || !email || !salary || !orgId) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
+
+    // Payroll sends here later — a malformed address must not reach the database
+    if (typeof walletAddress !== "string" || !isAddress(walletAddress)) {
+      return NextResponse.json({ error: "Invalid EVM wallet address" }, { status: 400 });
+    }
+    const address = getAddress(walletAddress);
 
     const userId = (session.user as { userId?: string }).userId; if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     await connectDB();
@@ -39,7 +46,7 @@ export async function POST(req: Request) {
       name,
       email: email.toLowerCase(),
       role: "employee",
-      linkedWallet: walletAddress,
+      linkedWallet: address,
       avatarColor: "#" + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0'),
       joinToken: token
     });
@@ -47,7 +54,7 @@ export async function POST(req: Request) {
     // 2. Track Employee globally in the specific Organisation scope
     const newEmp = await Employee.create({
       name,
-      walletAddress,
+      walletAddress: address,
       salary,
       orgId,
       status: "pending"

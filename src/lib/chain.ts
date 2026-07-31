@@ -547,7 +547,18 @@ export function parseChainError(error: unknown): string {
     return 'Transaction rejected in your wallet'
   }
 
-  const raw = error instanceof Error ? error.message : String(error)
+  // Wallets bury the useful sentence in `details` / `cause`; the top-level
+  // message is often just "There was an error attempting to sign".
+  const nested = error as { details?: string; shortMessage?: string; cause?: { message?: string } }
+  const raw = [
+    error instanceof Error ? error.message : String(error),
+    nested?.details,
+    nested?.shortMessage,
+    nested?.cause?.message,
+  ]
+    .filter(Boolean)
+    .join(' | ')
+
   const code = (error as { code?: number })?.code
 
   if (code === 4001 || /user rejected|user denied/i.test(raw)) {
@@ -566,6 +577,12 @@ export function parseChainError(error: unknown): string {
     [/chain(-| )?id|chain mismatch|does not match/i, `Wrong network — switch your wallet to ${ACTIVE_CHAIN.name}`],
     [/execution reverted/i, 'Transaction reverted on chain'],
     [/no wallet installed/i, 'No wallet detected. Install MetaMask to continue.'],
+    // The wallet's catch-all when it cannot build the transaction. On a send of
+    // the full balance the real cause is almost always no room left for gas.
+    [
+      /error attempting to sign|failed to sign|unable to sign/i,
+      `Your wallet could not sign this. Leave some ${NATIVE_SYMBOL} unspent to cover gas, then retry.`,
+    ],
   ]
 
   for (const [pattern, message] of patterns) {
