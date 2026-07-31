@@ -8,6 +8,7 @@ import { SessionWatcher } from "@/components/SessionWatcher";
 import { OrgProvider } from "@/lib/context/OrgContext";
 import WalletStatusBar from "@/components/shared/WalletStatusBar";
 import Level1StatusBadge from "@/components/shared/Level1StatusBadge";
+import EmployerSidebar from "@/components/employer/EmployerSidebar";
 import { isOnRobinhoodChain } from "@/lib/chain";
 import { ACTIVE_CHAIN } from "@/lib/chains";
 
@@ -76,8 +77,13 @@ export default function EmployerLayout({
           </div>
         )}
         <WalletStatusBar />
-        <div className="flex-1 overflow-hidden">
-          {children}
+        {/* Sidebar lives here so every employer page gets navigation, not just
+            the dashboard — the other routes previously had no way in or out. */}
+        <div className="flex flex-1 overflow-hidden bg-background">
+          <EmployerSidebar />
+          <div className="flex-1 overflow-hidden">
+            {children}
+          </div>
         </div>
         <Level1StatusBadge />
       </div>

@@ -188,15 +188,6 @@ const statusConfig: Record<
   },
 };
 
-const NAV_ITEMS = [
-  { icon: LayoutDashboard, label: "Dashboard", active: true, color: "#6366f1" },
-  { icon: Users, label: "Employees", active: false, color: "#8b5cf6" },
-  { icon: Coins, label: "Payroll", active: false, color: "#06b6d4" },
-  { icon: FileText, label: "History", active: false, color: "#10b981" },
-  { icon: Activity, label: "Analytics", active: false, color: "#0ea5e9" },
-  { icon: Settings, label: "Settings", active: false, color: "#f59e0b" },
-];
-
 /* ─────────────────────────────────────────────
  *  CountUp Animation Hook
  * ───────────────────────────────────────────── */
@@ -632,63 +623,7 @@ export default function EmployerDashboard() {
   const isMissingWallet = !orgLoading && !!activeOrg && (!userWallet || !activeOrg.walletAddress);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
-      {/* --- Sidebar --- */}
-      <aside className="hidden lg:flex w-64 flex-col bg-[#0f0f2e] border-r border-white/[0.06] text-foreground transition-all duration-300 relative z-20">
-        {/* Logo Area */}
-        <div className="px-6 py-8 border-b border-white/[0.06]">
-          <h1 className="text-2xl font-bold gradient-text tracking-tight">PaySlip</h1>
-          <p className="text-[11px] text-textMuted font-medium uppercase tracking-widest mt-1">Payroll on Robinhood Chain</p>
-        </div>
-        
-        {/* Nav */}
-        <nav className="flex-1 px-3 py-6 space-y-1">
-          {NAV_ITEMS.map(({ icon: Icon, label, active, color }) => (
-            <button
-              key={label}
-              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium transition-all duration-200 group relative ${
-                active
-                  ? "text-foreground"
-                  : "text-textMuted hover:text-foreground hover:bg-white/[0.04]"
-              }`}
-              style={{
-                backgroundColor: active ? `${color}14` : undefined, // 0.08 opacity in hex is approx 14
-              }}
-            >
-              {active && (
-                <div 
-                  className="absolute left-0 w-[4px] h-6 rounded-r-full" 
-                  style={{ backgroundColor: color }} 
-                />
-              )}
-              <Icon 
-                className={`h-4 w-4 transition-colors ${active ? "" : "group-hover:text-foreground"}`} 
-                style={{ color: active ? color : undefined }}
-              />
-              <span style={{ color: active ? color : undefined }}>{label}</span>
-            </button>
-          ))}
-        </nav>
-
-        {/* Sidebar Bottom Section */}
-        <div className="p-5 border-t border-white/[0.06] bg-black/20 space-y-4">
-          <div className="space-y-1">
-            <p className="text-[10px] font-bold text-textHint uppercase tracking-wider">Available Balance</p>
-            <p className="text-lg font-bold gradient-text-2 font-mono truncate">
-              {balance ? `${formatETH(Number(balance))} ETH` : "0.00 ETH"}
-            </p>
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <div className="px-2.5 py-1 rounded-full bg-sky/15 border border-sky/20">
-              <span className="text-[9px] font-black text-sky uppercase tracking-tighter">Robinhood Chain Testnet</span>
-            </div>
-            <span className="text-[10px] text-textHint font-medium">
-              {lastLoginText}
-            </span>
-          </div>
-        </div>
-      </aside>
+    <div className="flex h-full overflow-hidden bg-background">
 
       {/* ─── Main Content ─── */}
       <main

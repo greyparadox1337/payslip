@@ -641,12 +641,14 @@ export default function HomePage() {
   const [feed, setFeed] = useState<FeedTx[]>([]);
   const [isAnnual, setIsAnnual] = useState(false);
 
-  useEffect(() => {
-    if (status === "authenticated") {
-      if (session?.user?.role === "employer") router.push("/employer/dashboard");
-      if (session?.user?.role === "employee") router.push("/employee/portal");
-    }
-  }, [status, session, router]);
+  // Deliberately no redirect: being signed in should not lock you out of the
+  // marketing site. The header offers a way through to the workspace instead.
+  const workspaceHref =
+    session?.user?.role === "employer"
+      ? "/employer/dashboard"
+      : session?.user?.role === "employee"
+        ? "/employee/portal"
+        : null;
 
   // Initialize fake feed
   useEffect(() => {
@@ -756,11 +758,11 @@ export default function HomePage() {
 
                 <div className="flex flex-col sm:flex-row items-center gap-4 mb-14 relative w-full sm:w-auto">
                   <Link
-                    href="/signup"
+                    href={workspaceHref ?? "/signup"}
                     className="w-full sm:w-auto text-center rounded-full bg-primary px-8 py-3.5 text-sm font-semibold text-white shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:shadow-[0_0_30px_rgba(99,102,241,0.6)] hover:bg-indigo-400 transition-all duration-300 relative overflow-hidden group"
                   >
                     <span className="absolute inset-0 w-full h-full bg-white/20 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
-                    Launch app
+                    {workspaceHref ? "Go to your workspace" : "Launch app"}
                   </Link>
                   <Link
                     href="/#features"
