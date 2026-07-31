@@ -10,9 +10,11 @@
 
 [![Robinhood Chain](https://img.shields.io/badge/Robinhood_Chain-Testnet_%7C_Mainnet-6366f1?style=flat-square)](https://docs.robinhood.com/chain/)
 [![Next.js](https://img.shields.io/badge/Next.js-14-000?style=flat-square&logo=next.js)](https://nextjs.org)
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Production_Ready-000000?style=flat-square&logo=vercel)](https://vercel.com)
 [![License](https://img.shields.io/badge/license-MIT-22d3ee?style=flat-square)](#license)
 
 </div>
+
 
 ---
 
