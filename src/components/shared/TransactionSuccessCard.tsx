@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { createPortal } from 'react-dom'
 import { Check, Copy, ExternalLink, X, Wallet, ArrowRight, Clock, Hash, Activity } from 'lucide-react'
 import { Confetti } from '../Confetti' // Adapted path
 import { Button } from '@/components/ui/button'
@@ -37,9 +37,11 @@ export default function TransactionSuccessCard({
 }: TransactionSuccessCardProps) {
   const [copied, setCopied] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setShowConfetti(true)
+    setMounted(true)
   }, [])
 
   const copyHash = () => {
@@ -53,14 +55,19 @@ export default function TransactionSuccessCard({
     return `${addr.slice(0, 6)}...${addr.slice(-6)}`
   }
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+  if (!mounted) return null
+
+  // Portalled to <body>: an ancestor with a transform (the page-enter animation
+  // wrapper) becomes the containing block for position:fixed, which pinned this
+  // overlay inside that wrapper instead of covering the viewport.
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
       {showConfetti && <Confetti />}
-      <motion.div 
-        initial={{ scale: 0.9, opacity: 0, y: 20 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        className="relative w-full max-w-lg overflow-hidden rounded-3xl bg-[#0d0d1f] border border-white/10 shadow-2xl"
-      >
+      {/* Scales with the viewport instead of sitting at a fixed 512px, and caps
+          its height so a tall payroll result scrolls rather than overflowing.
+          Entrance is CSS rather than framer-motion, whose animation was not
+          running here — leaving the card stuck at its initial opacity of 0. */}
+      <div className="relative w-full max-w-xl sm:max-w-2xl lg:max-w-3xl max-h-[92vh] overflow-y-auto overflow-x-hidden rounded-3xl bg-[#0d0d1f] border border-white/10 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
         {/* Animated Border Effect */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute inset-0 rounded-3xl border-2 border-transparent" 
@@ -74,7 +81,7 @@ export default function TransactionSuccessCard({
           />
         </div>
 
-        <div className="relative p-8 flex flex-col items-center">
+        <div className="relative p-8 sm:p-10 lg:p-12 flex flex-col items-center">
           {/* Close Button */}
           <button 
             onClick={onClose}
@@ -85,7 +92,7 @@ export default function TransactionSuccessCard({
 
           {/* Animated Checkmark */}
           <div className="relative mb-6">
-            <svg className="w-20 h-20 text-indigo-500" viewBox="0 0 52 52">
+            <svg className="w-24 h-24 sm:w-28 sm:h-28 text-indigo-500" viewBox="0 0 52 52">
               <circle 
                 className="stroke-current fill-none" 
                 cx="26" cy="26" r="25" 
@@ -111,15 +118,15 @@ export default function TransactionSuccessCard({
             </svg>
           </div>
 
-          <h2 className="text-3xl font-bold gradient-text mb-2 text-center">{title}</h2>
-          <p className="text-muted-foreground mb-6 text-center">{subtitle}</p>
+          <h2 className="text-3xl sm:text-4xl font-bold gradient-text mb-2 text-center">{title}</h2>
+          <p className="text-base sm:text-lg text-muted-foreground mb-6 text-center max-w-lg">{subtitle}</p>
 
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-xs font-bold text-indigo-400 mb-8">
-            <Check size={12} /> {network}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-xs sm:text-sm font-bold text-indigo-400 mb-8">
+            <Check size={14} /> {network}
           </div>
 
           {/* Wallet Section */}
-          <div className="w-full bg-white/5 rounded-2xl p-5 mb-4 border border-white/5 space-y-4">
+          <div className="w-full bg-white/5 rounded-2xl p-5 sm:p-6 mb-4 border border-white/5 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Wallet size={16} />
@@ -133,14 +140,14 @@ export default function TransactionSuccessCard({
             
             <div className="flex items-center justify-between">
               <div className="text-sm text-muted-foreground">Wallet Balance</div>
-              <div className="text-2xl font-bold text-indigo-500">
+              <div className="text-2xl sm:text-3xl font-bold text-indigo-500">
                 {walletBalance || "0.00"} <span className="text-sm font-medium text-muted-foreground">ETH</span>
               </div>
             </div>
           </div>
 
           {/* Transaction Section */}
-          <div className="w-full space-y-3 mb-8 px-2">
+          <div className="w-full space-y-3 sm:space-y-4 mb-8 px-2">
             <div className="flex justify-between items-center text-sm">
               <span className="text-muted-foreground flex items-center gap-2"><Hash size={14} /> Hash</span>
               <button 
@@ -178,7 +185,7 @@ export default function TransactionSuccessCard({
           </div>
 
           {/* Action Buttons */}
-          <div className="grid grid-cols-2 gap-4 w-full">
+          <div className="grid grid-cols-2 gap-4 w-full sm:max-w-md">
             <Button 
               variant="outline" 
               onClick={onClose}
@@ -197,7 +204,7 @@ export default function TransactionSuccessCard({
             </Button>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       <style jsx global>{`
         @keyframes rotateBorder {
@@ -213,6 +220,7 @@ export default function TransactionSuccessCard({
           100% { stroke-dashoffset: 0; }
         }
       `}</style>
-    </div>
+    </div>,
+    document.body
   )
 }
