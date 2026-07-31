@@ -308,29 +308,79 @@ export async function sendNative(params: {
       fee: formatEther(receipt.gasUsed * receipt.effectiveGasPrice),
     }
   } catch (error: unknown) {
-    console.error('sendNative failure:', error)
+    // Wallets report signing failures with a generic string in the UI while the
+    // actionable part sits in these fields. Log all of them — without this there
+    // is nothing to go on when a send fails on someone else's machine.
+    const e = error as {
+      code?: unknown
+      details?: unknown
+      shortMessage?: unknown
+      cause?: { code?: unknown; message?: unknown }
+    }
+    console.error('sendNative failure', {
+      message: error instanceof Error ? error.message : String(error),
+      code: e?.code,
+      details: e?.details,
+      shortMessage: e?.shortMessage,
+      causeCode: e?.cause?.code,
+      causeMessage: e?.cause?.message,
+      chainId: ACTIVE_CHAIN.id,
+      request: {
+        from: params.sourceAddress,
+        to: params.destinationAddress,
+        value: params.amountEth,
+        hasMemo: Boolean(params.memo),
+      },
+    })
+
     return {
       success: false,
       error: parseChainError(error),
-      code: error instanceof BaseError ? error.name : 'error',
+      code: String(e?.code ?? (error instanceof BaseError ? error.name : 'error')),
     }
   }
 }
 
 /**
+ * Fallback gas for one native transfer when the node cannot be asked.
+ *
+ * Not 21000: Robinhood Chain is an Arbitrum Orbit L2 and charges for posting
+ * the transaction to L1 on top of L2 execution, so a bare transfer measures
+ * ~28200 here. Quoting 21000 understates every fee on this chain.
+ */
+const FALLBACK_TRANSFER_GAS = BigInt(35000)
+
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000' as const
+
+/**
  * Estimated gas cost, in ETH, of one native transfer carrying `memo` as calldata.
- * Unlike Stellar's flat 100-stroop fee, EVM cost moves with gas price and payload
- * size, so the UI has to ask rather than hardcode it.
+ * Unlike Stellar's flat 100-stroop fee, EVM cost moves with gas price, payload
+ * size, and L1 posting costs, so ask the node rather than compute it.
  */
 export async function estimateTransferFee(memo?: string): Promise<number> {
   try {
     const gasPrice = await publicClient.getGasPrice()
-    // 21000 base + 16 gas per non-zero calldata byte (EIP-2028 worst case)
-    const calldataGas = memo ? BigInt(toHex(memo).slice(2).length / 2) * BigInt(16) : BigInt(0)
-    const gas = BigInt(21000) + calldataGas
+    const gas = await estimateTransferGas(memo)
     return parseFloat(formatEther(gas * gasPrice))
   } catch {
     return 0
+  }
+}
+
+/** Gas units for one native transfer, measured against the node. */
+async function estimateTransferGas(memo?: string): Promise<bigint> {
+  const probe = (await getConnectedAddress()) ?? ZERO_ADDRESS
+  try {
+    // Zero-value self-send: same shape as a real payment, so the node prices
+    // the L1 posting component too, without needing a funded balance.
+    return await publicClient.estimateGas({
+      account: probe,
+      to: probe,
+      value: BigInt(0),
+      ...(memo ? { data: toHex(memo) } : {}),
+    })
+  } catch {
+    return FALLBACK_TRANSFER_GAS
   }
 }
 

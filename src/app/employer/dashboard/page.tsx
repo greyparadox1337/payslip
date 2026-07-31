@@ -375,6 +375,7 @@ export default function EmployerDashboard() {
   const [formWallet, setFormWallet] = useState("");
   const [formSalary, setFormSalary] = useState("");
   const [savingEmployee, setSavingEmployee] = useState(false);
+  const [creatingOrg, setCreatingOrg] = useState(false);
 
   // Payroll Modal State
   const [payrollModalOpen, setPayrollModalOpen] = useState(false);
@@ -459,6 +460,21 @@ export default function EmployerDashboard() {
     setFormWallet(emp.walletAddress);
     setFormSalary(String(emp.salary));
     setEmpDialogOpen(true);
+  }
+
+  // Recovery path for accounts created before signup started making one.
+  async function handleCreateDefaultOrg() {
+    setCreatingOrg(true);
+    try {
+      const owner = session?.user?.name ?? "My";
+      const ok = await createOrg(`${owner}'s Organisation`);
+      addToast(
+        ok ? "Organisation created" : "Could not create organisation",
+        ok ? "success" : "error"
+      );
+    } finally {
+      setCreatingOrg(false);
+    }
   }
 
   async function handleSaveEmployee() {
@@ -763,6 +779,29 @@ export default function EmployerDashboard() {
         </header>
 
         {/* --- PERSISTENT BANNERS --- */}
+        {/* Without an organisation nothing on this page can work — employees,
+            payroll and the wallet link all hang off an orgId. Say so plainly
+            rather than letting every action fail one at a time. */}
+        {!orgLoading && !activeOrg && (
+          <div className="mx-6 lg:mx-8 mt-6 bg-amber-500/10 border-l-[3px] border-amber-500 rounded-r-lg p-3.5 flex items-center justify-between shadow-sm">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="h-[18px] w-[18px] text-amber-400" />
+              <p className="text-[13px] font-medium text-amber-100/90">
+                No organisation yet. Create one before adding employees or running payroll.
+              </p>
+            </div>
+            <Button
+              onClick={handleCreateDefaultOrg}
+              disabled={creatingOrg}
+              size="sm"
+              className="bg-amber-500 hover:bg-amber-600 text-white h-8 text-[12px]"
+            >
+              {creatingOrg && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
+              Create organisation
+            </Button>
+          </div>
+        )}
+
         {isMissingWallet && !showMismatch && (
           <div className="mx-6 lg:mx-8 mt-6 bg-indigo-500/10 border-l-[3px] border-indigo-500 rounded-r-lg p-3.5 flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-3">
