@@ -1,59 +1,17 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import connectDB from "@/lib/db";
-import { Invite } from "@/lib/models/Invite";
-import { Organisation } from "@/lib/models/Organisation";
+import { NextResponse } from 'next/server';
 
-export async function POST(
-  req: Request,
-  { params }: { params: { token: string } }
-) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    await connectDB();
-    const userId = (session.user as { userId?: string }).userId; if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export async function GET() {
+  return NextResponse.json({ error: 'Endpoint pending Supabase migration' }, { status: 501 });
+}
 
-    const invite = await Invite.findOne({ token: params.token, status: "pending" });
-    if (!invite || invite.expiresAt < new Date()) {
-      return NextResponse.json({ error: "Invite invalid or expired" }, { status: 400 });
-    }
+export async function POST() {
+  return NextResponse.json({ error: 'Endpoint pending Supabase migration' }, { status: 501 });
+}
 
-    // Verify user isn't already a member
-    const org = await Organisation.findById(invite.orgId);
-    if (!org) {
-      return NextResponse.json({ error: "Org not found" }, { status: 404 });
-    }
-    const exists = (org.members as unknown[]).some((m) => {
-      const mm = m as { userId?: { toString: () => string } | string };
-      const id = typeof mm.userId === "string" ? mm.userId : mm.userId?.toString?.();
-      return id === userId;
-    });
-    if (exists) {
-      invite.status = 'revoked'; // Invalidate if they bypass constraints
-      await invite.save();
-      return NextResponse.json({ error: "Already a member" }, { status: 400 });
-    }
+export async function PUT() {
+  return NextResponse.json({ error: 'Endpoint pending Supabase migration' }, { status: 501 });
+}
 
-    await Organisation.findByIdAndUpdate(invite.orgId, {
-      $push: {
-        members: {
-          userId,
-          role: invite.role,
-          addedAt: new Date()
-        }
-      }
-    });
-
-    invite.status = 'accepted';
-    await invite.save();
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("POST /api/invite/[token]/accept error:", error);
-    return NextResponse.json({ error: "Internal Error" }, { status: 500 });
-  }
+export async function DELETE() {
+  return NextResponse.json({ error: 'Endpoint pending Supabase migration' }, { status: 501 });
 }

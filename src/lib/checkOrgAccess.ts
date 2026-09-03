@@ -1,9 +1,4 @@
-import { Organisation } from "./models/Organisation";
-
-type OrgMemberLike = {
-  userId?: { toString: () => string } | string;
-  role?: string;
-};
+import { getServiceSupabase } from "./supabase";
 
 export async function checkOrgAccess(
   userId: string,
@@ -11,20 +6,30 @@ export async function checkOrgAccess(
   required: "viewer" | "admin" | "owner"
 ): Promise<{ allowed: boolean; reason?: string; userRole?: string }> {
   try {
-    const org = await Organisation.findById(orgId);
-    if (!org || org.deletedAt) {
+    const supabase = getServiceSupabase();
+    
+    const { data: org, error } = await supabase
+      .from('organisations')
+      .select('*')
+      .eq('id', orgId)
+      .is('deleted_at', null)
+      .single();
+
+    if (error || !org) {
       return { allowed: false, reason: "not found" };
     }
 
-    if (org.ownerId.toString() === userId) {
+    if (org.owner_id === userId) {
       return { allowed: true, userRole: "owner" };
     }
 
-    const member = (org.members as unknown[]).find((m) => {
-      const mm = m as OrgMemberLike;
-      const id = typeof mm.userId === "string" ? mm.userId : mm.userId?.toString?.();
-      return id === userId;
-    }) as OrgMemberLike | undefined;
+    const { data: member } = await supabase
+      .from('organisation_members')
+      .select('role')
+      .eq('org_id', orgId)
+      .eq('user_id', userId)
+      .single();
+
     if (!member) {
       return { allowed: false, reason: "not a member" };
     }

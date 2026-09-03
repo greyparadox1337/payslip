@@ -292,7 +292,7 @@ export default function EmployeesPage() {
                     </div>
                   </div>
                   <div>
-                    <label className="text-[12px] font-bold text-muted-foreground uppercase tracking-wider mb-2 block pl-1">Robinhood Chain Wallet Address</label>
+                    <label className="text-[12px] font-bold text-muted-foreground uppercase tracking-wider mb-2 block pl-1">Botchain Wallet Address</label>
                     <Input 
                       required
                       placeholder="0x…" 

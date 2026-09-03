@@ -54,7 +54,7 @@ export default function EmployerSidebar() {
         <Link href="/" className="block group">
           <h1 className="text-2xl font-bold gradient-text tracking-tight">PaySlip</h1>
           <p className="text-[11px] text-textMuted font-medium uppercase tracking-widest mt-1">
-            Payroll on Robinhood Chain
+            Payroll on Botchain
           </p>
         </Link>
       </div>

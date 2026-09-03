@@ -53,7 +53,7 @@ export default function OrganisationSettingsPage() {
           <Building2 className="h-8 w-8 text-indigo-400" />
           Organisation Profile
         </h1>
-        <p className="text-muted-foreground mt-1">Manage your company's global identity on the Robinhood Chain.</p>
+        <p className="text-muted-foreground mt-1">Manage your company's global identity on the Botchain.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
@@ -120,7 +120,7 @@ export default function OrganisationSettingsPage() {
             
             <div className="space-y-4">
               <div>
-                <label className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest mb-2 block pl-1">Robinhood Chain Public Identity</label>
+                <label className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest mb-2 block pl-1">Botchain Public Identity</label>
                 <div className="flex gap-2">
                   <div className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 font-mono text-[13px] text-indigo-300 overflow-hidden text-ellipsis">
                     {currentOrg?.walletAddress || "No wallet linked"}
@@ -165,7 +165,7 @@ export default function OrganisationSettingsPage() {
             <ShieldCheck className="h-8 w-8 text-indigo-400 mb-4" />
             <h4 className="text-lg font-bold text-white mb-2">Verified Profile</h4>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Your organisation identity is linked to your Robinhood Chain account. This ensures all payroll events are cryptographically signed by your domain.
+              Your organisation identity is linked to your Botchain account. This ensures all payroll events are cryptographically signed by your domain.
             </p>
           </div>
 

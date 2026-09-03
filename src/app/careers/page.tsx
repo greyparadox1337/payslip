@@ -16,11 +16,11 @@ const OPEN_ROLES = [
   },
   {
     id: 'blockchain',
-    title: 'Robinhood Chain/Blockchain Developer',
+    title: 'Botchain/Blockchain Developer',
     dept: 'Engineering',
     color: 'cyan',
     details: 'Remote · Part-time or Full-time',
-    description: 'Design and implement secure, efficient smart contracts on Robinhood Chain. You will bridge the gap between traditional finance and decentralized on-chain settlements.',
+    description: 'Design and implement secure, efficient smart contracts on Botchain. You will bridge the gap between traditional finance and decentralized on-chain settlements.',
     skills: ['viem', 'Solidity', 'TypeScript', 'Smart Contracts'],
   },
   {
@@ -44,7 +44,7 @@ const OPEN_ROLES = [
 ]
 
 const BENEFITS = [
-  { title: 'Paid in ETH', desc: 'Optional crypto salaries via Robinhood Chain.', icon: Coins, color: 'text-amber-400', bg: 'bg-amber-400/10' },
+  { title: 'Paid in ETH', desc: 'Optional crypto salaries via Botchain.', icon: Coins, color: 'text-amber-400', bg: 'bg-amber-400/10' },
   { title: 'Remote First', desc: 'Work from anywhere in the world.', icon: Globe, color: 'text-cyan-400', bg: 'bg-cyan-400/10' },
   { title: 'Equity', desc: 'Stock options for early employees.', icon: Rocket, color: 'text-violet-400', bg: 'bg-violet-400/10' },
   { title: 'Move Fast', desc: 'Iterate daily on modern tech stacks.', icon: Zap, color: 'text-sky-400', bg: 'bg-sky-400/10' },
@@ -69,7 +69,7 @@ export default function CareersPage() {
               </span>
             </h1>
             <p className="text-slate-400 text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed">
-              Remote-first, async-friendly, and obsessed with blockchain technology. Join our mission to modernize payments on the Robinhood Chain.
+              Remote-first, async-friendly, and obsessed with blockchain technology. Join our mission to modernize payments on the Botchain.
             </p>
           </div>
         </section>

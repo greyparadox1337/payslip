@@ -143,7 +143,7 @@ export default function EmployeeProfile() {
     
     setIsDownloading(true);
     try {
-      // 1. Read incoming payments for this wallet off Robinhood Chain
+      // 1. Read incoming payments for this wallet off Botchain
       const records = await getTransactionHistory(profile.linkedWallet);
       if (records.length === 0) {
         addToast("No transactions found on network history", "info");
@@ -170,7 +170,7 @@ export default function EmployeeProfile() {
 
       addToast("Payslips exported successfully", "success");
     } catch(err: any) {
-      addToast("Failed querying Robinhood Chain", "error");
+      addToast("Failed querying Botchain", "error");
     } finally {
       setIsDownloading(false);
     }
@@ -232,7 +232,7 @@ export default function EmployeeProfile() {
             
             <div className="space-y-4">
               <div className="bg-background rounded-lg border border-border/30 p-4">
-                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-widest mb-2">Robinhood Chain Target</p>
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-widest mb-2">Botchain Target</p>
                 <div className="flex items-center justify-between">
                   {profile?.linkedWallet ? (
                     <span className="font-mono text-[14px] font-medium text-cyan-400 tracking-tight">

@@ -94,12 +94,12 @@ export default function AboutPage() {
             </div>
           </div>
 
-          {/* Block 2: Why Robinhood Chain */}
+          {/* Block 2: Why Botchain */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="order-2 lg:order-1">
               <div className="relative p-10 rounded-3xl bg-cyan-500/5 border border-cyan-500/20 flex flex-col items-center text-center group">
                 <Zap className="h-16 w-16 text-cyan-400 mb-6 group-hover:scale-110 transition-transform" />
-                <h4 className="text-2xl font-bold text-white mb-2">Robinhood Chain Network</h4>
+                <h4 className="text-2xl font-bold text-white mb-2">Botchain Network</h4>
                 <p className="text-sm text-cyan-400/80 font-bold uppercase tracking-widest mb-6">Built for payments</p>
                 <div className="grid grid-cols-2 gap-8 w-full border-t border-cyan-500/20 pt-8">
                   <div>
@@ -114,9 +114,9 @@ export default function AboutPage() {
               </div>
             </div>
             <div className="space-y-6 order-1 lg:order-2 border-l-4 border-cyan-500 lg:border-l-0 lg:border-r-4 lg:pr-8 lg:text-right">
-              <h3 className="text-2xl font-bold text-cyan-400 uppercase tracking-widest">Why Robinhood Chain</h3>
+              <h3 className="text-2xl font-bold text-cyan-400 uppercase tracking-widest">Why Botchain</h3>
               <p className="text-lg text-textMuted leading-relaxed">
-                Robinhood Chain processes transactions in under 5 seconds for a fraction of a cent. It&rsquo;s the only blockchain built specifically for payments and financial access. We chose Robinhood Chain because it shares our mission of financial inclusion.
+                Botchain processes transactions in under 5 seconds for a fraction of a cent. It&rsquo;s the only blockchain built specifically for payments and financial access. We chose Botchain because it shares our mission of financial inclusion.
               </p>
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-cyan-500/10 border border-cyan-500/20 text-cyan-500 text-xs font-bold rounded">
                 Optimal for high-velocity payroll
@@ -145,7 +145,7 @@ export default function AboutPage() {
               },
               { 
                 title: "Transparent", 
-                body: "Every payment is public on the Robinhood Chain ledger. No hidden fees, ever. Total immutable audit trail.",
+                body: "Every payment is public on the Botchain ledger. No hidden fees, ever. Total immutable audit trail.",
                 icon: Eye,
                 color: "sky"
               },
@@ -184,7 +184,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Robinhood Chain Partnership Footer */}
+      {/* Botchain Partnership Footer */}
       <section className="py-24 text-center px-6 border-t border-border/20">
         <p className="text-sm font-bold text-textHint uppercase tracking-widest mb-8">Proud to build on</p>
         <div className="flex flex-col items-center gap-6 mb-12">
@@ -192,20 +192,20 @@ export default function AboutPage() {
             <Zap className="h-12 w-12 text-indigo-400 group-hover:scale-110 transition-transform" />
             <div className="h-10 w-px bg-white/20" />
             <div className="text-left">
-              <p className="text-xl font-black tracking-tighter">Robinhood Chain</p>
+              <p className="text-xl font-black tracking-tighter">Botchain</p>
               <p className="text-[10px] font-bold text-textHint uppercase tracking-widest">Development Foundation</p>
             </div>
           </div>
           <p className="max-w-xl text-textMuted leading-relaxed">
-            PaySlip is built on the Robinhood Chain, chosen for its speed, low cost, and mission alignment with financial inclusion.
+            PaySlip is built on the Botchain, chosen for its speed, low cost, and mission alignment with financial inclusion.
           </p>
         </div>
         <Link 
-          href="https://docs.robinhood.com/chain/" 
+          href="https://docs.Botchain.com/chain/" 
           target="_blank"
           className="inline-flex items-center gap-2 text-sky-400 font-bold hover:text-sky-300 transition-colors"
         >
-          Learn more about Robinhood Chain <ArrowRight className="h-4 w-4" />
+          Learn more about Botchain <ArrowRight className="h-4 w-4" />
         </Link>
       </section>
 

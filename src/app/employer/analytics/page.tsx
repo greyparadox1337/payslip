@@ -249,7 +249,7 @@ export default function AnalyticsPage() {
                Smart Insight
             </div>
             <h3 className="text-2xl md:text-3xl font-black text-white mb-4 tracking-tighter leading-tight">
-               Your organisation saved <span className="text-cyan-400">$3,420</span> in settlement fees this quarter using Robinhood Chain.
+               Your organisation saved <span className="text-cyan-400">$3,420</span> in settlement fees this quarter using Botchain.
             </h3>
             <p className="text-lg text-slate-400 max-w-xl leading-relaxed mb-8">
                By bypassing traditional bank rails, PaySlip reduced your cross-border friction from 3.5% to <span className="font-bold text-white">0.05%</span>.

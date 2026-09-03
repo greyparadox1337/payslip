@@ -1,32 +1,5 @@
-import connectDB from "@/lib/db";
-export const dynamic = 'force-dynamic';
-import { User } from "@/lib/models/User";
-import JoinClientFlow from "./JoinClientFlow";
+import React from 'react';
 
-export default async function JoinPage({ params }: { params: Promise<{ token: string }> }) {
-  const { token } = await params;
-  await connectDB();
-  const user = await User.findOne({ joinToken: token });
-  
-  if (!user) {
-    return (
-       <div className="min-h-screen flex items-center justify-center bg-background text-foreground p-4">
-          <div className="p-8 bg-card border border-border/20 rounded-xl shadow-xl max-w-md w-full text-center space-y-4">
-             <div className="mx-auto w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center">
-               <span className="text-red-500 text-xl font-bold">!</span>
-             </div>
-             <h2 className="text-xl font-bold">Invalid Invite</h2>
-             <p className="text-[13px] text-muted-foreground">This invitation link is invalid or has already been used to create an account.</p>
-          </div>
-       </div>
-    );
-  }
-
-  return (
-    <JoinClientFlow 
-      token={token} 
-      name={user.name} 
-      email={user.email} 
-    />
-  );
+export default function Page() {
+  return <div className="p-8 text-center text-red-500">This feature is temporarily unavailable due to the database migration.</div>;
 }

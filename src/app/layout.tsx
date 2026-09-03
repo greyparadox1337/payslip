@@ -18,8 +18,8 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Payslip — Robinhood Chain Payments",
-  description: "Send payslips and ETH payments on the Robinhood Chain",
+  title: "Payslip — Botchain Payments",
+  description: "Send payslips and ETH payments on the Botchain",
 };
 
 export default function RootLayout({

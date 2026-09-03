@@ -416,12 +416,12 @@ function ChainFlowDiagram() {
           <div className="absolute -right-2 -top-1 border-t-4 border-l-4 border-transparent border-l-cyan-500 h-2 w-2" />
         </div>
 
-        {/* Robinhood Chain Node */}
+        {/* Botchain Node */}
         <div className="flex flex-col items-center group">
           <div className="w-20 h-20 rounded-full border-2 border-cyan-500/50 bg-cyan-500/10 flex items-center justify-center shadow-[0_0_30px_rgba(34,211,238,0.2)] animate-pulse group-hover:scale-110 transition-transform duration-300">
             <Zap className="h-9 w-9 text-cyan-400" />
           </div>
-          <p className="mt-4 text-xs font-bold tracking-widest text-cyan-400 uppercase">Robinhood Chain Network</p>
+          <p className="mt-4 text-xs font-bold tracking-widest text-cyan-400 uppercase">Botchain Network</p>
         </div>
 
         {/* Arrow 2 Container */}
@@ -743,7 +743,7 @@ export default function HomePage() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
                   </span>
-                  <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent italic">Robinhood Chain Network Native</span>
+                  <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent italic">Botchain Network Native</span>
                 </div>
               </div>
 
@@ -878,7 +878,7 @@ export default function HomePage() {
           {[...Array(2)].map((_, i) => (
             <React.Fragment key={i}>
               <span className="text-sm font-bold text-slate-500 flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" /> ROBINHOOD CHAIN NATIVE
+                <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" /> Botchain NATIVE
               </span>
               <span className="text-sm font-bold text-slate-500 flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-violet-500" /> INSTANT DISBURSEMENT
@@ -1042,7 +1042,7 @@ function FeaturesSection() {
           <div className="h-1 w-[60px] bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          <FeatureCard index={0} icon={Rocket} title="Instant global payroll" body="Send salaries to any wallet address worldwide. Transactions confirm in under 5 seconds on Robinhood Chain." iconBg="bg-indigo-500/15" iconColor="text-indigo-400" hoverGlow="indigo-500/40" />
+          <FeatureCard index={0} icon={Rocket} title="Instant global payroll" body="Send salaries to any wallet address worldwide. Transactions confirm in under 5 seconds on Botchain." iconBg="bg-indigo-500/15" iconColor="text-indigo-400" hoverGlow="indigo-500/40" />
           <FeatureCard index={1} icon={Coins} title="Near-zero fees" body="Pay your entire team for less than $0.01 in network fees. No hidden charges, ever." iconBg="bg-amber-500/15" iconColor="text-amber-400" hoverGlow="amber-500/40" />
           <FeatureCard index={2} icon={ShieldCheck} title="Immutable payslips" body="Every payment creates a permanent blockchain record. No disputes, no questions." iconBg="bg-cyan-500/15" iconColor="text-cyan-400" hoverGlow="cyan-500/40" />
           <FeatureCard index={3} icon={ArrowRightLeft} title="ETH and USDC" body="Pay in native ETH or USDC stablecoin. Employees choose what they receive." iconBg="bg-cyan-500/15" iconColor="text-cyan-400" hoverGlow="cyan-500/40" />

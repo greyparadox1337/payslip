@@ -187,7 +187,7 @@ export default function HistoryPage() {
          <div>
             <h4 className="text-sm font-bold text-amber-400 mb-1">On-Chain immutability</h4>
             <p className="text-xs text-amber-500/70 leading-relaxed max-w-2xl">
-               Every salary disbursement shown here is cryptographically verifiable on the Robinhood Chain Network. These records serve as an official audit trail for your organisation's financial compliance.
+               Every salary disbursement shown here is cryptographically verifiable on the Botchain Network. These records serve as an official audit trail for your organisation's financial compliance.
             </p>
          </div>
       </div>

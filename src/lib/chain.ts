@@ -12,6 +12,7 @@ import {
   numberToHex,
   BaseError,
   UserRejectedRequestError,
+  parseAbi,
   type Address,
   type Hash,
   type EIP1193Provider,
@@ -189,14 +190,14 @@ export async function getWalletChainId(): Promise<number | null> {
 /**
  * True when the wallet is on the chain this deployment targets
  */
-export async function isOnRobinhoodChain(): Promise<boolean> {
+export async function isOnBotChain(): Promise<boolean> {
   return (await getWalletChainId()) === ACTIVE_CHAIN.id
 }
 
 /**
- * Ask the wallet to switch to Robinhood Chain, adding the network first if it is unknown.
+ * Ask the wallet to switch to BOT Chain, adding the network first if it is unknown.
  */
-export async function switchToRobinhoodChain(): Promise<void> {
+export async function switchToBotChain(): Promise<void> {
   const provider = getProvider()
   if (!provider) throw new Error('No wallet installed')
 
@@ -271,7 +272,7 @@ function getWalletClient(account: Address) {
 // ── 2. WALLET CONNECT / DISCONNECT ───────────────────────────
 
 /**
- * Prompt the wallet for account access and make sure it is on Robinhood Chain.
+ * Prompt the wallet for account access and make sure it is on Botchain.
  */
 export async function connectInjectedWallet(): Promise<{
   address: Address
@@ -292,8 +293,8 @@ export async function connectInjectedWallet(): Promise<{
     }
     const address = getAddress(accounts[0])
 
-    if (!(await isOnRobinhoodChain())) {
-      await switchToRobinhoodChain()
+    if (!(await isOnBotChain())) {
+      await switchToBotChain()
     }
 
     const chainId = (await getWalletChainId()) ?? ACTIVE_CHAIN.id
@@ -344,7 +345,7 @@ export function onWalletChange(handlers: {
 // ── 3. BALANCE HANDLING ───────────────────────────────────────
 
 /**
- * Fetch native ETH balance for a wallet address from Robinhood Chain
+ * Fetch native ETH balance for a wallet address from Botchain
  */
 export async function getNativeBalance(address: string): Promise<number> {
   if (!isAddress(address)) return 0
@@ -471,7 +472,7 @@ export async function sendNative(params: {
 /**
  * Fallback gas for one native transfer when the node cannot be asked.
  *
- * Not 21000: Robinhood Chain is an Arbitrum Orbit L2 and charges for posting
+ * Not 21000: Botchain is an Arbitrum Orbit L2 and charges for posting
  * the transaction to L1 on top of L2 execution, so a bare transfer measures
  * ~28200 here. Quoting 21000 understates every fee on this chain.
  */
@@ -558,20 +559,34 @@ export async function getTransactionHistory(address: string): Promise<PaymentRec
   if (!isAddress(address)) return []
 
   try {
-    const res = await fetch(
-      `${EXPLORER_API_URL}/v2/addresses/${getAddress(address)}/transactions?filter=to`,
-      { headers: { accept: 'application/json' } }
-    )
-    if (!res.ok) return []
+    const [txRes, internalRes] = await Promise.all([
+      fetch(`${EXPLORER_API_URL}/v2/addresses/${getAddress(address)}/transactions?filter=to`, {
+        headers: { accept: 'application/json' },
+      }),
+      fetch(`${EXPLORER_API_URL}/v2/addresses/${getAddress(address)}/internal-transactions?filter=to`, {
+        headers: { accept: 'application/json' },
+      }),
+    ])
 
-    const data = await res.json()
-    const items: any[] = Array.isArray(data?.items) ? data.items : []
+    const data = txRes.ok ? await txRes.json() : { items: [] }
+    const internalData = internalRes.ok ? await internalRes.json() : { items: [] }
+
+    const items: any[] = [
+      ...(Array.isArray(data?.items) ? data.items : []),
+      ...(Array.isArray(internalData?.items) ? internalData.items : []),
+    ]
+
+    // Sort by timestamp descending
+    items.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
 
     const records: PaymentRecord[] = []
 
-    for (const tx of items.slice(0, 20)) {
+    for (const tx of items) {
+      if (records.length >= 20) break
       if (tx.status && tx.status !== 'ok') continue
-      if (typeof tx.hash !== 'string') continue
+      
+      const hash = tx.hash || tx.transaction_hash
+      if (typeof hash !== 'string') continue
       if (typeof tx.value !== 'string') continue
       if (typeof tx.timestamp !== 'string') continue
 
@@ -579,7 +594,6 @@ export async function getTransactionHistory(address: string): Promise<PaymentRec
       if (typeof to !== 'string') continue
       if (getAddress(to) !== getAddress(address)) continue
 
-      // Skip zero-value calls — this list is a payment history
       let amount: string
       try {
         if (BigInt(tx.value) === BigInt(0)) continue
@@ -588,9 +602,12 @@ export async function getTransactionHistory(address: string): Promise<PaymentRec
         continue
       }
 
+      // Avoid duplicates from internal and external
+      if (records.some((r) => r.id === hash)) continue
+
       records.push({
-        id: tx.hash,
-        transactionHash: tx.hash,
+        id: hash,
+        transactionHash: hash,
         amount,
         createdAt: tx.timestamp,
         to,
@@ -620,19 +637,27 @@ export type BulkDisburseResult = {
  * fails independently — a failure does not roll back earlier payments, so the
  * caller must surface the per-entry results rather than a single status.
  */
+// NOTE: Deploy BatchPayroll.sol and update this address.
+const BATCH_PAYROLL_ADDRESS = (process.env.NEXT_PUBLIC_BATCH_PAYROLL_ADDRESS || '') as Address
+
+const BATCH_PAYROLL_ABI = parseAbi([
+  'function bulkDisburse(address[] calldata recipients, uint256[] calldata amounts, string[] calldata memos) external payable',
+])
+
+/**
+ * Disburse BOT to multiple employees using the BatchPayroll smart contract.
+ */
 export async function bulkDisburse(
   entries: { destination: string; amount: string; employeeName: string }[],
   currency: string = NATIVE_SYMBOL,
-  // Off by default: a memo rides as calldata, and not every wallet can sign a
-  // value transfer that carries data. See sendNative.
   options: { includeMemo?: boolean } = {}
 ): Promise<BulkDisburseResult[]> {
-  const results: BulkDisburseResult[] = []
-
   let sourceAddress: string
+  let walletClient
   try {
     const { address } = await connectInjectedWallet()
     sourceAddress = address
+    walletClient = getWalletClient(getAddress(address))
   } catch (error: unknown) {
     return entries.map((entry) => ({
       success: false,
@@ -642,34 +667,40 @@ export async function bulkDisburse(
     }))
   }
 
-  for (const entry of entries) {
-    const result = await sendNative({
-      sourceAddress,
-      destinationAddress: entry.destination,
-      amountEth: entry.amount,
-      ...(options.includeMemo
-        ? { memo: `Payroll ${currency} - ${entry.employeeName}` }
-        : {}),
+  const recipients = entries.map((e) => getAddress(e.destination))
+  const amounts = entries.map((e) => parseEther(e.amount))
+  const memos = entries.map((e) =>
+    options.includeMemo ? `Payroll ${currency} - ${e.employeeName}` : ''
+  )
+  const totalAmount = amounts.reduce((sum, amount) => sum + amount, BigInt(0))
+
+  try {
+    const txHash = await walletClient.writeContract({
+      account: getAddress(sourceAddress),
+      chain: ACTIVE_CHAIN,
+      address: BATCH_PAYROLL_ADDRESS,
+      abi: BATCH_PAYROLL_ABI,
+      functionName: 'bulkDisburse',
+      args: [recipients, amounts, memos],
+      value: totalAmount,
     })
 
-    results.push(
-      result.success
-        ? {
-            success: true,
-            txHash: result.txHash,
-            employeeName: entry.employeeName,
-            destination: entry.destination,
-          }
-        : {
-            success: false,
-            error: result.error,
-            employeeName: entry.employeeName,
-            destination: entry.destination,
-          }
-    )
+    // Return success for all entries since it's a single batch transaction
+    return entries.map((entry) => ({
+      success: true,
+      txHash,
+      employeeName: entry.employeeName,
+      destination: entry.destination,
+    }))
+  } catch (error: unknown) {
+    const parsedError = parseChainError(error)
+    return entries.map((entry) => ({
+      success: false,
+      error: parsedError,
+      employeeName: entry.employeeName,
+      destination: entry.destination,
+    }))
   }
-
-  return results
 }
 
 /**

@@ -2,9 +2,7 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import connectDB from "@/lib/db";
-import { User } from "@/lib/models/User";
-import { Organisation } from "@/lib/models/Organisation";
+import { getServiceSupabase } from "@/lib/supabase";
 
 type WalletJwtPayload = JwtPayload & { userId?: string };
 
@@ -30,7 +28,7 @@ export const authOptions: NextAuthOptions = {
         walletToken: { label: "Wallet Token", type: "text" }
       },
       async authorize(credentials) {
-        await connectDB();
+        const supabase = getServiceSupabase();
         
         let user;
 
@@ -41,8 +39,15 @@ export const authOptions: NextAuthOptions = {
            try {
              const decoded = jwt.verify(credentials.walletToken, secret) as WalletJwtPayload;
              if (!decoded.userId) throw new Error("Invalid wallet payload");
-             user = await User.findById(decoded.userId);
-             if (!user) throw new Error("Invalid wallet payload");
+             
+             const { data: userData, error } = await supabase
+               .from('users')
+               .select('*')
+               .eq('id', decoded.userId)
+               .single();
+               
+             if (error || !userData) throw new Error("Invalid wallet payload");
+             user = userData;
            } catch {
              throw new Error("Wallet authentication failed");
            }
@@ -52,48 +57,81 @@ export const authOptions: NextAuthOptions = {
           if (!credentials?.email || !credentials.password) {
             throw new Error("Missing credentials");
           }
-          user = await User.findOne({ email: credentials.email.toLowerCase() });
-          if (!user) {
+          
+          const { data: userData, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('email', credentials.email.toLowerCase())
+            .single();
+            
+          if (error || !userData) {
             throw new Error("Invalid email or password");
           }
-          if (user.lockedUntil && user.lockedUntil > new Date()) {
-            const diffMin = Math.ceil((user.lockedUntil.getTime() - new Date().getTime()) / 60000);
+          user = userData;
+          
+          if (user.locked_until && new Date(user.locked_until) > new Date()) {
+            const diffMin = Math.ceil((new Date(user.locked_until).getTime() - new Date().getTime()) / 60000);
             throw new Error(`Account locked. Try again in ${diffMin} minutes.`);
           }
-          const isMatch = user.passwordHash ? await bcrypt.compare(credentials.password, user.passwordHash) : false;
+          
+          const isMatch = user.password_hash ? await bcrypt.compare(credentials.password, user.password_hash) : false;
+          
           if (!isMatch) {
-            user.failedLoginAttempts += 1;
-            if (user.failedLoginAttempts >= 5) {
-              user.lockedUntil = new Date(Date.now() + 15 * 60 * 1000);
+            const failedAttempts = (user.failed_login_attempts || 0) + 1;
+            const updateData: any = { failed_login_attempts: failedAttempts };
+            
+            if (failedAttempts >= 5) {
+              updateData.locked_until = new Date(Date.now() + 15 * 60 * 1000).toISOString();
             }
-            await user.save();
+            
+            await supabase.from('users').update(updateData).eq('id', user.id);
             throw new Error("Invalid email or password");
           }
         }
 
         // Success: Reset metrics & timestamp
-        user.failedLoginAttempts = 0;
-        user.lockedUntil = undefined;
-        user.lastLogin = new Date();
-        await user.save();
+        await supabase.from('users').update({
+          failed_login_attempts: 0,
+          locked_until: null,
+          last_login: new Date().toISOString()
+        }).eq('id', user.id);
 
         // Fetch primary organisation if employer
         let orgName = undefined;
         if (user.role === "employer") {
-          const org = await Organisation.findOne({ 
-            $or: [{ ownerId: user._id }, { "members.userId": user._id }] 
-          });
-          if (org) orgName = org.name;
+          const { data: orgData } = await supabase
+            .from('organisations')
+            .select('name')
+            .eq('owner_id', user.id)
+            .limit(1)
+            .single();
+            
+          if (orgData) {
+            orgName = orgData.name;
+          } else {
+            const { data: memberData } = await supabase
+              .from('organisation_members')
+              .select('organisations(name)')
+              .eq('user_id', user.id)
+              .limit(1)
+              .single();
+              
+            if (memberData && memberData.organisations) {
+              orgName = Array.isArray(memberData.organisations) 
+                ? memberData.organisations[0].name 
+                : (memberData.organisations as any).name;
+            }
+          }
         }
 
         return {
-          id: user._id.toString(),
+          id: user.id,
           email: user.email,
           name: user.name,
           role: user.role,
-          linkedWallet: user.linkedWallet,
+          linkedWallet: user.linked_wallet,
           rememberMe: credentials?.rememberMe === "true",
-          lastLogin: user.lastLogin,
+          lastLogin: user.last_login ? new Date(user.last_login) : undefined,
           orgName
         };
       }

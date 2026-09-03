@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 const SLIDES = [
   {
     title: "Welcome to PaySlip",
-    description: "The enterprise-grade payroll system running natively on the Robinhood Chain.",
+    description: "The enterprise-grade payroll system running natively on the Botchain.",
     icon: <Coins className="h-12 w-12 text-primary" />,
   },
   {

@@ -11,7 +11,7 @@ Payday shouldn't take 3 business days. 🧨
 
 PaySlip: payroll that settles in seconds, on-chain.
 
-⚡ ETH salaries on Robinhood Chain
+⚡ ETH salaries on Botchain
 🌐 Virtual platform — no bank, no borders, no wire fees
 🧾 Every payslip provable forever
 
@@ -46,7 +46,7 @@ Your money, your keys, no 3-day "pending." ⚡
 
 ## POST 4 — reply (call to action)
 
-Built on Robinhood Chain — an Arbitrum Orbit L2 settling to Ethereum.
+Built on Botchain — an Arbitrum Orbit L2 settling to Ethereum.
 
 Grab testnet ETH from the faucet, run a payroll, break something, tell us.
 
@@ -62,5 +62,5 @@ Code: github.com/parth1241/payslip
 - Swap `[YOUR_URL]` before posting.
 - Char counts (X weighting, emoji = 2): P1 275, P2 219, P3 184, P4 227. All
   under 280 — no Premium needed.
-- Avoid "same ETH you hold in the Robinhood app" — implies a Robinhood app
-  integration PaySlip does not have. "Built on Robinhood Chain" is accurate.
+- Avoid "same ETH you hold in the Botchain app" — implies a Botchain app
+  integration PaySlip does not have. "Built on Botchain" is accurate.

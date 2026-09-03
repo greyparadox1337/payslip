@@ -29,7 +29,7 @@ export default function TransactionSuccessCard({
   amount,
   walletAddress,
   walletBalance,
-  network = "Robinhood Chain Testnet",
+  network = "Botchain Testnet",
   timestamp = new Date().toLocaleString(),
   extraDetails,
   onClose,

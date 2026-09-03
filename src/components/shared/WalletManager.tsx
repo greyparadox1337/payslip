@@ -6,8 +6,8 @@ import {
   connectInjectedWallet,
   disconnectWallet,
   getNativeBalance,
-  isOnRobinhoodChain,
-  switchToRobinhoodChain,
+  isOnBotChain,
+  switchToBotChain,
   parseChainError,
   listWallets,
   selectWallet,
@@ -54,7 +54,7 @@ export default function WalletManager() {
         return
       }
 
-      if (!(await isOnRobinhoodChain())) {
+      if (!(await isOnBotChain())) {
         setStatus('WRONG_NETWORK')
         return
       }
@@ -136,7 +136,7 @@ export default function WalletManager() {
     setTimeout(() => setIsRefreshing(false), 1000)
   }
 
-  // The Robinhood Chain testnet faucet is a hosted page with no programmatic
+  // The Botchain Testnet faucet is a hosted page with no programmatic
   // drip endpoint, so we open it and re-read the balance when the user returns.
   const handleFund = () => {
     window.open(`${FAUCET_URL}?address=${address}`, '_blank', 'noopener,noreferrer')
@@ -145,7 +145,7 @@ export default function WalletManager() {
   const handleSwitchNetwork = async () => {
     setError(null)
     try {
-      await switchToRobinhoodChain()
+      await switchToBotChain()
       await checkStatus()
     } catch (err: unknown) {
       setError(parseChainError(err))

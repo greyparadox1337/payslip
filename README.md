@@ -6,9 +6,9 @@
 
 ### Payroll at the speed of a block.
 
-**Pay your whole team in ETH on Robinhood Chain. Seconds, not days.**
+**Pay your whole team in ETH on Botchain. Seconds, not days.**
 
-[![Robinhood Chain](https://img.shields.io/badge/Robinhood_Chain-Testnet_%7C_Mainnet-6366f1?style=flat-square)](https://docs.robinhood.com/chain/)
+[![Botchain](https://img.shields.io/badge/Botchain_Chain-Testnet_%7C_Mainnet-6366f1?style=flat-square)](https://docs.Botchain.com/chain/)
 [![Next.js](https://img.shields.io/badge/Next.js-14-000?style=flat-square&logo=next.js)](https://nextjs.org)
 [![Vercel Deployment](https://img.shields.io/badge/Vercel-Production_Ready-000000?style=flat-square&logo=vercel)](https://vercel.com)
 [![License](https://img.shields.io/badge/license-MIT-22d3ee?style=flat-square)](#license)
@@ -26,7 +26,7 @@ Meanwhile the money exists as a number in a database the whole time.
 
 ## What PaySlip does
 
-PaySlip moves payroll onto [Robinhood Chain](https://docs.robinhood.com/chain/) — an Arbitrum Orbit L2 that settles to Ethereum. An employer connects a wallet, imports their team, and runs payroll. Every employee is paid in native ETH, directly to their own wallet, and every payment leaves a permanent record on a public ledger.
+PaySlip moves payroll onto [Botchain](https://docs.Botchain.com/chain/) — an Arbitrum Orbit L2 that settles to Ethereum. An employer connects a wallet, imports their team, and runs payroll. Every employee is paid in native ETH, directly to their own wallet, and every payment leaves a permanent record on a public ledger.
 
 No bank hours. No correspondent chain. No "it's pending."
 
@@ -45,12 +45,12 @@ No bank hours. No correspondent chain. No "it's pending."
 ## How it works
 
 ```
-Employer wallet  ──▶  PaySlip  ──▶  Robinhood Chain  ──▶  Employee wallets
+Employer wallet  ──▶  PaySlip  ──▶  Botchain  ──▶  Employee wallets
                                           │
                                           └──▶  Explorer = permanent receipt
 ```
 
-1. **Connect** — any injected EVM wallet (MetaMask, Rabby, …). PaySlip prompts to add and switch to Robinhood Chain on first connect.
+1. **Connect** — any injected EVM wallet (MetaMask, Rabby, …). PaySlip prompts to add and switch to Botchain on first connect.
 2. **Import your team** — names, roles, salaries, wallet addresses.
 3. **Run payroll** — review the batch, confirm, and each employee is paid in native ETH.
 4. **Receipts** — every payment carries a memo in its calldata, permanently attached to the transfer and readable from the explorer.
@@ -62,10 +62,10 @@ Payroll runs settle as one transaction per employee, so each payment is independ
 |  | Testnet (default) | Mainnet |
 |---|---|---|
 | Chain ID | `46630` | `4663` |
-| RPC | `https://rpc.testnet.chain.robinhood.com` | `https://rpc.mainnet.chain.robinhood.com` |
-| Explorer | https://explorer.testnet.chain.robinhood.com | https://robinhoodchain.blockscout.com |
+| RPC | `https://rpc.testnet.chain.Botchain.com` | `https://rpc.mainnet.chain.Botchain.com` |
+| Explorer | https://explorer.testnet.chain.Botchain.com | https://Botchainchain.blockscout.com |
 | Gas token | ETH | ETH |
-| Faucet | https://faucet.testnet.chain.robinhood.com | — |
+| Faucet | https://faucet.testnet.chain.Botchain.com | — |
 
 Switch with `NEXT_PUBLIC_CHAIN_ENV` (`testnet` or `mainnet`). Chain definitions live in [src/lib/chains.ts](src/lib/chains.ts); every chain call goes through [src/lib/chain.ts](src/lib/chain.ts).
 
@@ -97,7 +97,7 @@ Real captures of the running app, at 2x DPI.
 
 ## Run it yourself
 
-**You'll need:** Node.js 18+, a MongoDB database, an EVM wallet extension, and testnet ETH from the [faucet](https://faucet.testnet.chain.robinhood.com).
+**You'll need:** Node.js 18+, a MongoDB database, an EVM wallet extension, and testnet ETH from the [faucet](https://faucet.testnet.chain.Botchain.com).
 
 ```bash
 git clone https://github.com/payslip-robin/payslip.git
@@ -107,7 +107,7 @@ cp .env.example .env.local   # add your MongoDB + NextAuth values
 npm run dev
 ```
 
-Open http://localhost:3000. The Robinhood Chain defaults need no API keys — only your database and auth secret. On first wallet connect the app will prompt you to add and switch to Robinhood Chain Testnet.
+Open http://localhost:3000. The Botchain defaults need no API keys — only your database and auth secret. On first wallet connect the app will prompt you to add and switch to Botchain Testnet.
 
 ## Built with
 

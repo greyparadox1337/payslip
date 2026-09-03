@@ -9,7 +9,7 @@ import { OrgProvider } from "@/lib/context/OrgContext";
 import WalletStatusBar from "@/components/shared/WalletStatusBar";
 import Level1StatusBadge from "@/components/shared/Level1StatusBadge";
 import EmployerSidebar from "@/components/employer/EmployerSidebar";
-import { isOnRobinhoodChain } from "@/lib/chain";
+import { isOnBotChain } from "@/lib/chain";
 import { ACTIVE_CHAIN } from "@/lib/chains";
 
 export default function EmployerLayout({
@@ -24,7 +24,7 @@ export default function EmployerLayout({
     async function checkNetwork() {
       if (typeof window === 'undefined') return
       try {
-        setWrongNetwork(!(await isOnRobinhoodChain()))
+        setWrongNetwork(!(await isOnBotChain()))
       } catch {
         // No wallet installed, handled by WalletManager
       }
