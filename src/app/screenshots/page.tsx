@@ -21,7 +21,7 @@ export default function ScreenshotsPage() {
           </h1>
         </div>
         <p className="text-slate-400 text-lg mb-6">
-          Use this page to capture all required submission screenshots for the Robinhood Chain Builder Track.
+          Use this page to capture all required submission screenshots for the Botchain Builder Track.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-indigo-500/10 border border-indigo-500/20 p-4 rounded-xl flex gap-3 italic text-sm">
@@ -63,7 +63,7 @@ export default function ScreenshotsPage() {
                 </div>
               </div>
               <div className="inline-block px-4 py-1 bg-indigo-600 text-white rounded text-xs font-bold uppercase tracking-widest">
-                Robinhood Chain Testnet
+                Botchain Testnet
               </div>
             </div>
           </Card>
@@ -84,7 +84,7 @@ export default function ScreenshotsPage() {
               <h3 className="text-7xl font-black text-indigo-400 tracking-tighter">
                 9,842.4231 ETH
               </h3>
-              <p className="text-slate-400 text-lg uppercase tracking-widest font-medium">Available on Robinhood Chain Testnet</p>
+              <p className="text-slate-400 text-lg uppercase tracking-widest font-medium">Available on Botchain Testnet</p>
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-lg border border-white/10 text-xs text-slate-400">
@@ -111,7 +111,7 @@ export default function ScreenshotsPage() {
           <div className="flex justify-center p-12 bg-indigo-500/5 rounded-3xl border border-indigo-500/10">
             <TransactionSuccessCard 
               title="Payroll Sent!"
-              subtitle="Employee salaries paid on Robinhood Chain Testnet"
+              subtitle="Employee salaries paid on Botchain Testnet"
               txHash={demoTxHash}
               amount="2,500 ETH"
               walletAddress="GDEMO...ADDR"
@@ -120,7 +120,7 @@ export default function ScreenshotsPage() {
                 { label: "Employees Paid", value: "5" },
                 { label: "Pay Period", value: "March 2025" },
                 { label: "Asset", value: "ETH (Native)" },
-                { label: "Network", value: "Robinhood Chain Testnet" }
+                { label: "Network", value: "Botchain Testnet" }
               ]}
               onClose={() => {}}
             />

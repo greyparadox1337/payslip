@@ -68,7 +68,7 @@ export default function WalletStatusBar() {
               </button>
             </div>
             <Badge variant="outline" className="h-4 text-[8px] font-black uppercase tracking-tighter p-0 text-muted-foreground border-none">
-              Robinhood Chain Testnet
+              Botchain Testnet
             </Badge>
           </div>
         </div>

@@ -144,7 +144,7 @@ export default function SendPanel({ defaultMemo = '', onSuccess, compact = false
             <p className="text-sm text-muted-foreground max-w-xs">
               {step === 'BUILDING' && `Preparing your ${NATIVE_SYMBOL} payment details.`}
               {step === 'SIGNING' && 'Please approve the transaction in your wallet.'}
-              {step === 'BROADCASTING' && 'Robinhood Chain blocks land in about 100ms.'}
+              {step === 'BROADCASTING' && 'Botchain blocks land in about 100ms.'}
             </p>
           </div>
           <div className="w-full max-w-xs rounded-lg bg-muted p-4 space-y-3">

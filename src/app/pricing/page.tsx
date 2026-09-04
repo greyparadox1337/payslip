@@ -13,11 +13,11 @@ const FAQS = [
   },
   {
     q: "Can I pay in USDC instead of ETH?",
-    a: "Yes. PaySlip supports any asset on the Robinhood Chain, with native support for ETH and Circle's USDC. You can choose the asset per-employee, allowing for a hybrid stable-volatile payroll strategy."
+    a: "Yes. PaySlip supports any asset on the Botchain, with native support for ETH and Circle's USDC. You can choose the asset per-employee, allowing for a hybrid stable-volatile payroll strategy."
   },
   {
     q: "What happens if a transaction fails?",
-    a: "Robinhood Chain transactions are atomic. If a ledger closes and your payment isn't included (due to insufficient funds or network congestion), the 'Payroll Tracker' will notify you immediately. You can then retry the specific failed recipient without re-sending to the entire team."
+    a: "Botchain transactions are atomic. If a ledger closes and your payment isn't included (due to insufficient funds or network congestion), the 'Payroll Tracker' will notify you immediately. You can then retry the specific failed recipient without re-sending to the entire team."
   },
   {
     q: "Do my employees need a crypto wallet?",
@@ -46,7 +46,7 @@ export default function PricingPage() {
             Simple, Transparent, On-Chain
           </div>
           <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-8 leading-tight tracking-tighter">
-            Pricing that scales with your <span className="gradient-text">Robinhood Chain team</span>
+            Pricing that scales with your <span className="gradient-text">Botchain team</span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Zero setup fees. Zero monthly subscriptions. Just pure, efficient payroll on the world's most performant network.
@@ -65,7 +65,7 @@ export default function PricingPage() {
               </div>
             </div>
             <ul className="space-y-4 mb-10">
-              {["Up to 5 employees", "Unlimited payroll runs", "Robinhood Chain ETH support", "MetaMask integration", "PDF Payslips"].map((f) => (
+              {["Up to 5 employees", "Unlimited payroll runs", "Botchain ETH support", "MetaMask integration", "PDF Payslips"].map((f) => (
                 <li key={f} className="flex items-center gap-3 text-sm text-slate-300">
                   <Check className="h-4 w-4 text-cyan-400 shrink-0" />
                   {f}
@@ -160,7 +160,7 @@ export default function PricingPage() {
             <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay"></div>
             <div className="relative z-10">
               <h2 className="text-3xl md:text-5xl font-black text-white mb-6 tracking-tighter">Ready to join the financial frontier?</h2>
-              <p className="text-white/80 text-lg mb-10 max-w-xl mx-auto font-medium">Join 500+ global teams paying their world-class talent natively on Robinhood Chain.</p>
+              <p className="text-white/80 text-lg mb-10 max-w-xl mx-auto font-medium">Join 500+ global teams paying their world-class talent natively on Botchain.</p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link href="/signup" className="px-10 h-14 bg-white text-indigo-600 rounded-full font-black text-lg hover:scale-105 active:scale-95 transition-all shadow-2xl">
                   Get Started for Free

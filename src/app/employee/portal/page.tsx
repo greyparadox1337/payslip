@@ -141,7 +141,7 @@ function ConnectScreen({
 
             <div className="flex items-center gap-2 justify-center mt-5 text-[12px] text-slate-400">
               <ShieldCheck className="h-3.5 w-3.5" />
-              Secured by Robinhood Chain Network · Testnet
+              Secured by Botchain Network · Testnet
             </div>
           </CardContent>
         </Card>
@@ -250,7 +250,7 @@ function PayslipCard({ record }: { record: PaymentRecord }) {
                   className="inline-flex items-center gap-1.5 text-[12px] font-medium text-primary hover:text-primary/80 transition-colors"
                   id={`view-tx-${record.id}`}
                 >
-                  View on Robinhood Chain Expert
+                  View on Botchain Expert
                   <ExternalLink className="h-3 w-3" />
                 </a>
               </div>
@@ -535,14 +535,14 @@ export default function EmployeePortal() {
                   Network
                 </p>
                 <p className="text-[13px] font-medium mt-1 text-indigo-200/80">
-                  Robinhood Chain Testnet
+                  Botchain Testnet
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Robinhood Chain Wallet Section */}
+        {/* Botchain Wallet Section */}
         <div className="grid grid-cols-1 gap-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <WalletManager />
@@ -625,16 +625,16 @@ export default function EmployeePortal() {
       <footer className="border-t border-border/20 mt-12 backdrop-blur-sm bg-background/50">
         <div className="mx-auto max-w-2xl px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-[12px] text-muted-foreground">
-            © {new Date().getFullYear()} Payslip · Powered by Robinhood Chain
+            © {new Date().getFullYear()} Payslip · Powered by Botchain
           </p>
           <div className="flex items-center gap-4 text-[12px] text-muted-foreground">
             <a
-              href="https://docs.robinhood.com/chain/"
+              href="https://docs.Botchain.com/chain/"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-primary transition-colors"
             >
-              Robinhood Chain.org
+              Botchain.org
             </a>
             <a
               href="https://metamask.io/download"

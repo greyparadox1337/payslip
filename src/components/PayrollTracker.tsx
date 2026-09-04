@@ -154,7 +154,7 @@ export function PayrollTracker({
     return (
       <TransactionSuccessCard 
         title="Payroll Complete!"
-        subtitle={`Successfully paid ${employees.length} employees on the Robinhood Chain.`}
+        subtitle={`Successfully paid ${employees.length} employees on the Botchain.`}
         txHash={txHash || ""}
         amount={totalAmount.toFixed(2)}
         walletAddress={walletAddr}

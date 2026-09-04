@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Transaction hash is required' }, { status: 400 })
     }
 
-    // Verify transaction exists on Robinhood Chain
+    // Verify transaction exists on Botchain
     const tx = await getTransactionByHash(txHash)
 
     if (!tx) {

@@ -80,7 +80,7 @@ export function WalletButton() {
         }
       }
 
-      addToast(`Connected to Robinhood Chain Testnet · ${truncateAddress(pubKey)}`, "success");
+      addToast(`Connected to Botchain Testnet · ${truncateAddress(pubKey)}`, "success");
     } catch (err) {
       addToast("Connection request rejected or failed", "error");
     } finally {

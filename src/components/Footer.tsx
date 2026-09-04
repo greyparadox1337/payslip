@@ -9,7 +9,7 @@ const FOOTER_LINKS = {
     { label: 'Features', href: '/#features' },
     { label: 'Pricing', href: '/pricing' },
     { label: 'Security', href: '/#security' },
-    { label: 'Robinhood Chain Network', href: 'https://docs.robinhood.com/chain/' },
+    { label: 'Botchain Network', href: 'https://docs.Botchain.com/chain/' },
   ],
   company: [
     { label: 'About', href: '/about' },
@@ -26,7 +26,7 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-16">
           
-          {/* Col 1: Brand & Robinhood Chain */}
+          {/* Col 1: Brand & Botchain */}
           <div className="space-y-6">
             <Link href="/" className="inline-block">
               <span className="text-2xl font-bold bg-gradient-to-r from-indigo-500 to-violet-500 bg-clip-text text-transparent">
@@ -34,11 +34,11 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-slate-400 text-sm leading-relaxed max-w-xs">
-              Modern global payroll on the Robinhood Chain. Send instant, low-cost payments to anyone, anywhere.
+              Modern global payroll on the Botchain. Send instant, low-cost payments to anyone, anywhere.
             </p>
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-sky-500/5 border border-sky-500/10 text-sky-400">
               <Cloud className="h-4 w-4" />
-              <span className="text-[10px] font-bold tracking-widest uppercase italic">Built on Robinhood Chain</span>
+              <span className="text-[10px] font-bold tracking-widest uppercase italic">Built on Botchain</span>
             </div>
           </div>
 

@@ -645,7 +645,7 @@ export default function EmployerDashboard() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
                 </span>
-                <span className="text-[10px] font-black text-white tracking-widest uppercase">Robinhood Chain Testnet</span>
+                <span className="text-[10px] font-black text-white tracking-widest uppercase">Botchain Testnet</span>
               </div>
             </div>
           </div>
@@ -837,7 +837,7 @@ export default function EmployerDashboard() {
             </Card>
           </div>
 
-          {/* Robinhood Chain Wallet Section */}
+          {/* Botchain Wallet Section */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-1">
               <WalletManager />

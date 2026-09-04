@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import connectDB from "@/lib/db";
-import { Organisation } from "@/lib/models/Organisation";
+import { getServiceSupabase } from "@/lib/supabase";
 
 export async function GET() {
   try {
@@ -10,17 +9,40 @@ export async function GET() {
     if (!session || !session.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    await connectDB();
 
-    const userId = (session.user as { userId?: string }).userId; if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const userId = (session.user as { userId?: string }).userId; 
     if (!userId) {
        return NextResponse.json({ error: "User ID missing from session" }, { status: 400 });
     }
 
-    const orgs = await Organisation.find({
-      $or: [{ ownerId: userId }, { "members.userId": userId }],
-      deletedAt: { $exists: false },
-    });
+    const supabase = getServiceSupabase();
+
+    // Find orgs where user is owner OR user is a member
+    const { data: ownedOrgs } = await supabase
+      .from('organisations')
+      .select('*')
+      .eq('owner_id', userId)
+      .is('deleted_at', null);
+
+    const { data: memberOrgs } = await supabase
+      .from('organisation_members')
+      .select('organisations(*)')
+      .eq('user_id', userId);
+
+    const orgsMap = new Map();
+    if (ownedOrgs) {
+      ownedOrgs.forEach(org => orgsMap.set(org.id, org));
+    }
+    if (memberOrgs) {
+      memberOrgs.forEach(member => {
+        const org = Array.isArray(member.organisations) ? member.organisations[0] : member.organisations;
+        if (org && !org.deleted_at) {
+          orgsMap.set(org.id, org);
+        }
+      });
+    }
+
+    const orgs = Array.from(orgsMap.values());
 
     return NextResponse.json(orgs);
   } catch (error) {
@@ -35,9 +57,8 @@ export async function POST(req: Request) {
     if (!session || !session.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    await connectDB();
 
-    const userId = (session.user as { userId?: string }).userId; if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const userId = (session.user as { userId?: string }).userId; 
     if (!userId) {
        return NextResponse.json({ error: "User ID missing" }, { status: 400 });
     }
@@ -49,31 +70,45 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Organisation name is required" }, { status: 400 });
     }
 
-    // Auto-generate slug
     let slug = name
       .toLowerCase()
       .replace(/\s+/g, "-")
       .replace(/[^a-z0-9-]/g, "");
 
-    // Check slug collision
-    const existing = await Organisation.findOne({ slug });
+    const supabase = getServiceSupabase();
+
+    const { data: existing } = await supabase
+      .from('organisations')
+      .select('id')
+      .eq('slug', slug)
+      .single();
+
     if (existing) {
       slug = `${slug}-${Math.floor(Math.random() * 1000)}`;
     }
 
-    const newOrg = await Organisation.create({
-      name,
-      slug,
-      industry,
-      ownerId: userId,
-      members: [
-        {
-          userId: userId,
-          role: "owner",
-          addedAt: new Date(),
-        },
-      ],
-    });
+    const { data: newOrg, error: orgError } = await supabase
+      .from('organisations')
+      .insert({
+        name,
+        slug,
+        industry,
+        owner_id: userId,
+      })
+      .select()
+      .single();
+
+    if (orgError || !newOrg) {
+      throw new Error("Failed to create organisation");
+    }
+
+    await supabase
+      .from('organisation_members')
+      .insert({
+        org_id: newOrg.id,
+        user_id: userId,
+        role: "owner",
+      });
 
     return NextResponse.json({ success: true, org: newOrg }, { status: 201 });
   } catch (error) {

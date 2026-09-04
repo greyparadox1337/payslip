@@ -115,7 +115,7 @@ export default function TeamPage() {
     {
       name: "Alice Roberts",
       role: "Tech Lead",
-      bio: "Passionate about building scalable distributed systems and high-throughput financial applications on Robinhood Chain.",
+      bio: "Passionate about building scalable distributed systems and high-throughput financial applications on Botchain.",
       skills: ["Rust", "Solidity", "Node.js"],
       initials: "AR",
       accent: "violet",
@@ -133,7 +133,7 @@ export default function TeamPage() {
     {
       name: "Sofia Yang",
       role: "Blockchain Dev",
-      bio: "Specialist in Robinhood Chain and on-chain asset bridging. Ensuring secure and instant settlement for global teams.",
+      bio: "Specialist in Botchain and on-chain asset bridging. Ensuring secure and instant settlement for global teams.",
       skills: ["Solidity", "C++", "Smart Contracts"],
       initials: "SY",
       accent: "cyan",

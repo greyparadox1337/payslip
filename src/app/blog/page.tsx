@@ -6,13 +6,13 @@ import PageLayout from "@/components/PageLayout";
 import { Zap, Calendar, Clock, User, ArrowRight, Mail, Sparkles, Filter } from "lucide-react";
 
 // --- Article Metadata ---
-type Category = "Product" | "Robinhood Chain" | "Payroll" | "Company" | "All";
+type Category = "Product" | "Botchain" | "Payroll" | "Company" | "All";
 
 interface Article {
   id: number;
   title: string;
   excerpt: string;
-  category: "Product" | "Robinhood Chain" | "Payroll" | "Company";
+  category: "Product" | "Botchain" | "Payroll" | "Company";
   author: string;
   readTime: string;
   date: string;
@@ -22,8 +22,8 @@ interface Article {
 const articles: Article[] = [
   {
     id: 1,
-    title: "Introducing PaySlip — Payroll for the Robinhood Chain Generation",
-    excerpt: "The wait is over. PaySlip is officially live, bringing instant, near-zero cost payroll to teams worldwide using the Robinhood Chain.",
+    title: "Introducing PaySlip — Payroll for the Botchain Generation",
+    excerpt: "The wait is over. PaySlip is officially live, bringing instant, near-zero cost payroll to teams worldwide using the Botchain.",
     category: "Product",
     author: "Parth Dhimman",
     readTime: "5 min",
@@ -32,9 +32,9 @@ const articles: Article[] = [
   },
   {
     id: 2,
-    title: "How Robinhood Chain makes global payroll 100x cheaper",
-    excerpt: "Traditional wire transfers are relics of the past. Harnessing Robinhood Chain’s efficient consensus mechanism, PaySlip reduces fees to a fraction of a cent.",
-    category: "Robinhood Chain",
+    title: "How Botchain makes global payroll 100x cheaper",
+    excerpt: "Traditional wire transfers are relics of the past. Harnessing Botchain’s efficient consensus mechanism, PaySlip reduces fees to a fraction of a cent.",
+    category: "Botchain",
     author: "Parth",
     readTime: "4 min",
     date: "March 2025",
@@ -53,7 +53,7 @@ const articles: Article[] = [
   {
     id: 4,
     title: "Building PaySlip in 48 hours at a hackathon",
-    excerpt: "From a whiteboard concept to a fully functional Robinhood Chain payment engine: the story of our journey building at the hackathon name.",
+    excerpt: "From a whiteboard concept to a fully functional Botchain payment engine: the story of our journey building at the hackathon name.",
     category: "Company",
     author: "The Team",
     readTime: "8 min",
@@ -167,9 +167,9 @@ function NewsletterSignup() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,_rgba(99,102,241,0.05),_transparent_50%)]" />
         
         <div className="relative z-10 max-w-lg text-center md:text-left">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">Stay updated on PaySlip and Robinhood Chain payroll</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">Stay updated on PaySlip and Botchain payroll</h2>
           <p className="text-textMuted text-base">
-            Get the latest product updates, Robinhood Chain news, and payroll insights delivered straight to your inbox.
+            Get the latest product updates, Botchain news, and payroll insights delivered straight to your inbox.
           </p>
         </div>
         
@@ -215,7 +215,7 @@ export default function BlogPage() {
             <span className="text-[10px] font-bold text-textHint uppercase tracking-widest">Filter by category</span>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4">
-            {(["All", "Product", "Robinhood Chain", "Payroll", "Company"] as Category[]).map((cat) => (
+            {(["All", "Product", "Botchain", "Payroll", "Company"] as Category[]).map((cat) => (
               <button 
                 key={cat}
                 onClick={() => setActiveCategory(cat)}

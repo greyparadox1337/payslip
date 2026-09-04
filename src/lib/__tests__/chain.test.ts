@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { validateAddress, decodeMemo, parseChainError } from '../chain'
 import { ACTIVE_CHAIN, explorerTxUrl } from '../chains'
 
-describe('Payslip Robinhood Chain Helpers', () => {
+describe('Payslip Botchain Helpers', () => {
   describe('validateAddress', () => {
     it('should validate correct 0x addresses', () => {
       const address = '0x742d35Cc6634C0532925a3b844Bc454e4438f44e'
@@ -80,13 +80,13 @@ describe('Payslip Robinhood Chain Helpers', () => {
   })
 
   describe('chain config', () => {
-    it('should target Robinhood Chain testnet by default', () => {
+    it('should target Botchain Testnet by default', () => {
       expect(ACTIVE_CHAIN.id).toBe(46630)
       expect(ACTIVE_CHAIN.nativeCurrency.symbol).toBe('ETH')
     })
 
     it('should build explorer links on the active chain', () => {
-      expect(explorerTxUrl('0xabc')).toBe('https://explorer.testnet.chain.robinhood.com/tx/0xabc')
+      expect(explorerTxUrl('0xabc')).toBe('https://explorer.testnet.chain.Botchain.com/tx/0xabc')
     })
   })
 })

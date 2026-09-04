@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import {
   isWalletInstalled,
-  isOnRobinhoodChain,
+  isOnBotChain,
   getNativeBalance
 } from '@/lib/chain'
 import { ACTIVE_CHAIN } from '@/lib/chains'
@@ -24,7 +24,7 @@ export default function Level1StatusBadge() {
     const checkAll = async () => {
       try {
         const installed = await isWalletInstalled()
-        const onChain = await isOnRobinhoodChain()
+        const onChain = await isOnBotChain()
         const address = localStorage.getItem('wallet_address')
         const isBalanceLoaded = address ? (await getNativeBalance(address)) >= 0 : false
         const isReady = installed && onChain && isBalanceLoaded

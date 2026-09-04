@@ -27,7 +27,7 @@ export interface SendValidation {
  * estimateTransferFee returns 0 both for "gas is nearly free" and for "the RPC
  * call failed". Trusting a 0 makes MAX offer the entire balance, and a transfer
  * with nothing left for gas cannot be signed at all — the wallet rejects it with
- * an opaque error. At Robinhood Chain's 0.01 gwei this is ~5000x a single
+ * an opaque error. At Botchain's 0.01 gwei this is ~5000x a single
  * transfer, and still a rounding error in ETH terms.
  */
 const FALLBACK_GAS_RESERVE = 0.000001

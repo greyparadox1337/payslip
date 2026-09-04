@@ -7,7 +7,7 @@ import { Loader2, AlertTriangle } from "lucide-react";
 import { SessionWatcher } from "@/components/SessionWatcher";
 import WalletStatusBar from "@/components/shared/WalletStatusBar";
 import Level1StatusBadge from "@/components/shared/Level1StatusBadge";
-import { isOnRobinhoodChain } from "@/lib/chain";
+import { isOnBotChain } from "@/lib/chain";
 import { ACTIVE_CHAIN } from "@/lib/chains";
 
 export default function EmployeeLayout({
@@ -22,7 +22,7 @@ export default function EmployeeLayout({
     async function checkNetwork() {
       if (typeof window === 'undefined') return
       try {
-        setWrongNetwork(!(await isOnRobinhoodChain()))
+        setWrongNetwork(!(await isOnBotChain()))
       } catch {
         // No wallet installed
       }

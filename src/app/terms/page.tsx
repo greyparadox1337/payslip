@@ -34,17 +34,17 @@ export default function TermsPage() {
                 Description of Service
               </h2>
               <p className="text-slate-300 leading-relaxed text-[15px]">
-                PaySlip provides a non-custodial interface for managing payroll on the Robinhood Chain. We facilitate the creation, signing, and broadcasting of transactions using the viem and the MetaMask browser extension. We do not provide financial, legal, or tax advice.
+                PaySlip provides a non-custodial interface for managing payroll on the Botchain. We facilitate the creation, signing, and broadcasting of transactions using the viem and the MetaMask browser extension. We do not provide financial, legal, or tax advice.
               </p>
             </section>
 
             <section>
               <h2 className="text-xl font-bold text-indigo-400 mb-4 tracking-tight flex items-center gap-2">
                 <div className="h-1.5 w-1.5 rounded-full bg-indigo-500"></div> 
-                Robinhood Chain Network Disclaimers
+                Botchain Network Disclaimers
               </h2>
               <p className="text-slate-300 leading-relaxed text-[15px]">
-                PaySlip operates on the Robinhood Chain. We are not responsible for network outages, ledger failures, or transaction delays. You acknowledge that blockchain transactions are irreversible and that PaySlip cannot "undo" or refund any payments successfully broadcast to the network.
+                PaySlip operates on the Botchain. We are not responsible for network outages, ledger failures, or transaction delays. You acknowledge that blockchain transactions are irreversible and that PaySlip cannot "undo" or refund any payments successfully broadcast to the network.
               </p>
             </section>
 

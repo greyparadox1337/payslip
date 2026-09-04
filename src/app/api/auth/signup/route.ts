@@ -1,15 +1,13 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import connectDB from "@/lib/db";
-import { User } from "@/lib/models/User";
-import { Organisation } from "@/lib/models/Organisation";
+import { getServiceSupabase } from "@/lib/supabase";
 
 /**
- * Give a new employer a workspace to land in. Mirrors POST /api/orgs, which is
- * still how anyone adds further organisations later.
+ * Give a new employer a workspace to land in.
  */
 async function createDefaultOrganisation(userId: string, ownerName: string) {
   const orgName = `${ownerName}'s Organisation`;
+  const supabase = getServiceSupabase();
 
   const base = orgName
     .toLowerCase()
@@ -17,16 +15,42 @@ async function createDefaultOrganisation(userId: string, ownerName: string) {
     .replace(/[^a-z0-9-]/g, "");
 
   let slug = base;
-  if (await Organisation.findOne({ slug })) {
+  
+  const { data: existingOrg } = await supabase
+    .from('organisations')
+    .select('slug')
+    .eq('slug', slug)
+    .single();
+
+  if (existingOrg) {
     slug = `${base}-${Math.floor(Math.random() * 1000)}`;
   }
 
-  return Organisation.create({
-    name: orgName,
-    slug,
-    ownerId: userId,
-    members: [{ userId, role: "owner", addedAt: new Date() }],
-  });
+  // Create organisation
+  const { data: org, error: orgError } = await supabase
+    .from('organisations')
+    .insert({
+      name: orgName,
+      slug,
+      owner_id: userId,
+    })
+    .select('id')
+    .single();
+
+  if (orgError || !org) {
+    throw new Error("Failed to create default organisation");
+  }
+
+  // Add member
+  await supabase
+    .from('organisation_members')
+    .insert({
+      org_id: org.id,
+      user_id: userId,
+      role: "owner"
+    });
+
+  return org;
 }
 
 export async function POST(req: Request) {
@@ -37,47 +61,54 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // Role safety check
     if (!['employer', 'employee'].includes(role)) {
       return NextResponse.json({ error: "Invalid role specified" }, { status: 400 });
     }
 
-    // Basic password safety
     if (password.length < 8) {
       return NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 });
     }
 
-    // Basic email validation regex
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return NextResponse.json({ error: "Invalid email format" }, { status: 400 });
     }
 
-    await connectDB();
+    const supabase = getServiceSupabase();
 
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', email.toLowerCase())
+      .single();
+
     if (existingUser) {
       return NextResponse.json({ error: "Email already registered" }, { status: 409 });
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
 
-    const newUser = await User.create({
-      name,
-      email: email.toLowerCase(),
-      passwordHash,
-      role
-    });
+    const { data: newUser, error: userError } = await supabase
+      .from('users')
+      .insert({
+        name,
+        email: email.toLowerCase(),
+        password_hash: passwordHash,
+        role
+      })
+      .select('id')
+      .single();
 
-    // Employers need an organisation to exist before the dashboard works at all:
-    // employees, payroll, and the wallet link all hang off an orgId. Signing up
-    // without one left the account in a dead state where every action failed.
+    if (userError || !newUser) {
+      throw new Error("Failed to create user");
+    }
+
     if (role === "employer") {
-      await createDefaultOrganisation(newUser._id.toString(), name);
+      await createDefaultOrganisation(newUser.id, name);
     }
 
     return NextResponse.json(
-      { success: true, message: "Account created", userId: newUser._id },
+      { success: true, message: "Account created", userId: newUser.id },
       { status: 201 }
     );
   } catch (error: any) {

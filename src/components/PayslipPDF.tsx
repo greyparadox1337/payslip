@@ -272,7 +272,7 @@ export const PayslipPDF = ({ txHash, employeeName, amount, date, networkFee = 0,
             <View style={styles.gridCol}>
               <Text style={styles.gridTitle}>Issued Date</Text>
               <Text style={styles.gridValue}>{date}</Text>
-              <Text style={styles.gridSubValue}>Network: Robinhood Chain Testnet</Text>
+              <Text style={styles.gridSubValue}>Network: Botchain Testnet</Text>
             </View>
           </View>
 
@@ -294,7 +294,7 @@ export const PayslipPDF = ({ txHash, employeeName, amount, date, networkFee = 0,
             <View style={styles.tableRow}>
               <View style={styles.colDesc}>
                 <Text style={styles.rowText}>Network Fees (Sponsored)</Text>
-                <Text style={styles.rowTextDim}>Gas paid by the employer on Robinhood Chain — not deducted from this payment</Text>
+                <Text style={styles.rowTextDim}>Gas paid by the employer on Botchain — not deducted from this payment</Text>
               </View>
               <View style={styles.colAmount}><Text style={styles.rowText}>{networkFee.toFixed(6)}</Text></View>
             </View>
@@ -325,7 +325,7 @@ export const PayslipPDF = ({ txHash, employeeName, amount, date, networkFee = 0,
               <Text style={styles.hashLabel}>BLOCKCHAIN TRANSACTION HASH</Text>
               <Text style={styles.hashValue}>{txHash || "PENDING_CONFIRMATION_ON_LEDGER"}</Text>
               <Text style={styles.verificationFooterText}>
-                Scan QR code to view this transaction on the public Robinhood Chain ledger.
+                Scan QR code to view this transaction on the public Botchain ledger.
               </Text>
             </View>
           </View>
@@ -333,7 +333,7 @@ export const PayslipPDF = ({ txHash, employeeName, amount, date, networkFee = 0,
           {/* Footer */}
           <View style={styles.footer}>
             <Text style={styles.footerText}>
-              This is a digital receipt of a blockchain transaction. PaySlip is a non-custodial payroll layer on the Robinhood Chain Network.
+              This is a digital receipt of a blockchain transaction. PaySlip is a non-custodial payroll layer on the Botchain Network.
               Values are cryptographically verifiable and immutable once recorded on the ledger.
             </Text>
           </View>
